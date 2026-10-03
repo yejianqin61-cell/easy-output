@@ -28,7 +28,7 @@ also holds for the Markdown version of the same document — the content contrac
 <body>
   <header>
     <h1>The verdict</h1>
-    <p class="status">Project analysis · 2026-10-04 · for review · locks: the queue choice</p>
+    <p class="status">Project analysis · 2026-10-03 · for review · locks: the queue choice</p>
     <section class="verdict"><!-- ≤150 words: recommendation, cost, risk, the ask --></section>
   </header>
   <nav><!-- table of contents; reports get skimmed, then re-read --></nav>
