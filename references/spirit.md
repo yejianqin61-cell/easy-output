@@ -92,38 +92,48 @@ video for one question, built in an hour and thrown away. These would never have
 themselves before. The win is not the artifact — it is the understanding you keep and the artifact
 you drop. See the discardable rule in [SKILL.md](../SKILL.md).
 
-**9. Do not let credentials be the gate.** No ElevenLabs key? Ask the model for decent free
-alternatives that run on local compute. Cost and access should change the route, not stop the
-work. See the audio section of [video-explainers.md](video-explainers.md).
+**9. Do not let credentials be the gate.** A missing key or an absent tool changes the route; ask
+for a capable alternative and carry on.
 
-**10. The human is the last consumer. Render for the human.** Every rule above is in service of a
+**10. The human is the last consumer. Write for the human.** Every rule above is in service of a
 person who has to understand something and then act on it.
 
-## How this skill weighs the four rungs
+## What this repository takes from the post
 
-The post is an escalation, and its author is most bullish on the last rung: bespoke explainer videos.
+The post is a four-rung escalation, and its author is most bullish on the last rung: bespoke explainer
+videos. This repository implements the first three rungs and applies them to **engineering documents**
+— project analysis, evaluation, execution plans, specs, ADRs, runbooks — because those are the
+artifacts a person has to approve and work from, and because that is where the failures hurt.
 
-**This skill deliberately re-centres that.** Its core is the first two rungs — readable, concise
-writing, with diagrams and HTML pages in support — because that is where almost all real output lives
-and where the failures actually hurt. Video is kept, and kept honest, as an explicitly opt-in rung 4
-that is never proposed by default. The four-rung escalation is faithful to the source; the emphasis
-is this skill's own editorial choice.
+| Rung | In this repository |
+|---|---|
+| 1. Constrained, cut prose | Implemented, and it carries the value. See [writing.md](writing.md), [conciseness.md](conciseness.md). |
+| 2. Diagrams | Implemented, as compression inside a document. See [diagrams.md](diagrams.md). |
+| 3. Web pages | Implemented, as the single-file HTML report a document renders into. See [html-report.md](html-report.md). |
+| 4. Explainer videos | Out of scope by choice. The source post's argument for it stands, and this repository does not carry the rung. |
 
-The third thing re-centred here is not in the post at all: **conciseness**. The post is about
-*representation* (which medium carries the idea). Its sibling failure — a clear document that is
-three times too long — is at least as common in model output, so
-[conciseness.md](conciseness.md) is a first-class part of this skill rather than a footnote to it.
+Two further departures, both deliberate:
+
+- **Conciseness is first-class here.** The post is about *representation* — which medium carries the
+  idea. The sibling failure, a clear document that runs three times too long, is at least as common in
+  model output, so [conciseness.md](conciseness.md) sits beside the medium question rather than under
+  it.
+- **The document shapes are ours.** The post supplies the writing standard. The section skeletons, the
+  decision-first summary, and the scope fence come from this repository; they are what make a document
+  auditable by a human in a couple of minutes. They build on
+  [`to-spec`](https://github.com/mattpocock/skills) (MIT, Matt Pocock), which optimizes a spec for the
+  agent consuming it. See [documents.md](documents.md).
 
 ## What the original post does not need, and this skill does
 
-Karpathy's tips assume a human expert judging output turn by turn: he can see at a glance whether
-a diagram is nonsense or a narration is mistimed. An agent following the same tips needs the
-guardrails he gets for free from his own eyes:
+Karpathy's tips assume a human expert judging output turn by turn: he sees at a glance whether a
+diagram is nonsense. An agent following the same tips needs the guardrails he gets for free from his
+own eyes:
 
-- **A verification gate.** Open it, render it, check the audio length. See [checklist.md](checklist.md).
-- **A budget.** Rung 4 costs minutes to hours of compute; rung 3 costs real wall-clock time to
-  get right. Ask before climbing.
-- **A refusal path.** Small questions deserve small answers. A skill that always builds an
-  artifact is a worse skill than no skill.
-- **Honesty about the artifact.** Generated visuals must not imply real footage; numbers need
-  sources; charts need labeled axes.
+- **A verification gate.** Open it, render it, walk the reviewer's first pass. See
+  [checklist.md](checklist.md).
+- **A budget.** The HTML report costs real wall-clock time to get right. Ask before climbing.
+- **A refusal path.** Small questions deserve small answers. A skill that always builds an artifact
+  is a worse skill than no skill.
+- **Honesty about the artifact.** Numbers need sources, charts need labelled axes, and assumptions
+  get labelled as assumptions.

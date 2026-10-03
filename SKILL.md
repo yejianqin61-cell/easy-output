@@ -1,141 +1,136 @@
 ---
 name: easy-output
 description: >
-  Use when a human must READ and understand what the model produces: explanations, summaries,
-  design docs, hand-off notes, PR descriptions, READMEs. Makes output readable and concise first —
-  ASD-STE100 constrained writing (dialable to a softer "80%"), strict cutting, and structure over
-  prose. Diagrams and single-file HTML pages are support, used only when they read faster than the
-  prose they replace. A custom explainer video is a final, opt-in rung, never proposed by default.
+  Use when an agent produces a document a human must read, review, approve, or act on: project
+  analysis, evaluation and option comparisons, execution plans, specs, ADRs, runbooks, hand-off
+  notes, PR descriptions. Enforces a decision-first summary, a heading per reader question, an
+  explicit scope fence, labelled assumptions, and ASD-STE100-grade clarity at ~80% strength with
+  strict cutting. Tables, diagrams and single-file HTML reports serve as compression, never as
+  decoration.
 
-  Trigger when the user asks to 解释/讲清楚/说明白/写清楚/精简/太长了/看不懂/简化/可视化/画个图/做个网页, or
-  says "explain X", "ELI5", "make this clearer", "too long", "tl;dr", "simplify this", "ASD-STE100",
-  "make a diagram", "output in HTML". Also apply proactively to a draft before sending it, when that
-  draft is long, padded, or serial prose.
+  Trigger when the user asks for 项目分析/评估/评估报告/方案对比/施工计划/实施方案/设计文档/需求文档/复盘/写文档,
+  or says "write a spec", "write up an analysis", "evaluate these options", "write the plan",
+  "make this readable", "too long", "tl;dr", "simplify this", "ASD-STE100", "output in HTML".
+  Apply it to a draft before it is sent, whenever that draft has run long or buried its conclusion.
 
   Don't use for writing code, for one-line facts, or when the output format is already fixed.
 license: MIT
-compatibility: No dependencies. Produces ordinary files (Markdown, HTML, SVG, MP4). Only the optional video rung needs ffmpeg and a TTS option.
+compatibility: No dependencies. Writes Markdown, plus optional SVG diagrams and single-file HTML reports.
 metadata:
   author: easy-output contributors
-  version: 0.1.0
+  version: 0.2.0
   category: document-creation
   pattern: context-aware
-  tags: [readability, conciseness, writing, diagram, html, explainer-video, ste100, output-format]
-  source: "Interpretation of Andrej Karpathy's post on making LLM output easier to understand (https://x.com/karpathy/status/2105819303471976479). Independent work, not endorsed by the author."
+  tags: [documents, spec, analysis, evaluation, execution-plan, adr, runbook, readability, conciseness, ste100]
+  source: "Applies Andrej Karpathy's post on making LLM output easier to understand (https://x.com/karpathy/status/2105819303471976479) to engineering documents, and sits as a readability layer over mattpocock/skills' to-spec (https://github.com/mattpocock/skills, MIT). Independent work; endorsed by neither author."
 ---
 
 # easy-output
 
-**Readable and concise is the product. Everything else is support.**
+**Engineering documents a human can read in minutes, holding the density the agent needs.**
 
-Most model output is not wrong; it is unclear and too long. Fix it in this order: **cut first,
-make it clear, then — only if it actually helps — change the medium.** This file holds the routing;
-read the `references/` files only as each rung needs them.
+The main case: the agent writes the deliverable — project analysis, evaluation, execution plan, spec,
+ADR, runbook — and a person has to approve it or work from it. This skill makes that document
+auditable fast: **cut, clarify, structure**, and only then render it differently.
 
-## The ladder
+Explaining a topic in chat stays supported as the secondary case.
 
-| Rung | Medium | Buys | Cost | Status |
-|---|---|---|---|---|
-| 0 | Chat prose | speed, diffs, grep | seconds | one-line facts |
-| 1 | Constrained, cut prose (ASD-STE100) | clarity + concision, one word = one meaning | +0 | **the core** |
-| 2 | Diagram | structure, relationships, compression | minutes | support |
-| 3 | Single-file interactive HTML | exploration, parameter manipulation | tens of minutes | support |
-| 4 | Custom explainer video | narrative, motion, timing | hours, needs audio | **opt-in only** |
+## The rungs
 
-Rungs 0–2 cover almost every request. Rung 3 is for content the reader must explore. **Rung 4 is a
-deliberate exception** — see "Where video stands". Climb only while the understanding gain beats the
-cost, and **stop at the rung where the human can act**. Never climb for decoration.
+| Rung | Output | Adds | Cost |
+|---|---|---|---|
+| 0 | A few sentences | speed, diffs, grep | seconds |
+| 1 | A written document: cut, constrained English | the document contract | — |
+| 2 | Plus tables and one or two diagrams | compression, structure | minutes |
+| 3 | Plus a single-file HTML report | navigability, charts, circulation | tens of minutes |
+
+Rung 1 carries the value. Rung 2 earns its place by replacing paragraphs. Rung 3 suits documents that
+get re-read, circulated, or carry several tables. **Stop at the rung where the human can approve the
+document.**
 
 ## Operating rules (always in force)
 
 1. **Cut first.** Delete what does not change what the reader knows or does: preamble, restating the
-   question, recaps in short texts, hedges, "it's worth noting that". Put the answer in the first
-   sentence. Prefer a list or a table over prose for parallel items. Read
+   question, recaps in short documents, hedges. Read
    [references/conciseness.md](references/conciseness.md).
 2. **Then make it clear.** One idea per sentence, active voice, short sentences, one word for one
-   meaning, no nominalizations. Default: **ASD-STE100 at about 80%** — keep the discipline, drop the
-   stiffness, allow one marked analogy. Read [references/writing.md](references/writing.md).
-3. **Name the rung and the medium, chosen from the shape of the content** — never from what is fun to
-   make. Work the five questions and the routing table below.
-4. **The artifact is the answer.** Rung 3/4: give the path, how to open it, the takeaway, what to try
-   first — do not restate it. Rung 1/2: the reply *is* the artifact; write it well and stop.
-5. **Self-contained or it does not count.** Single file where possible; inline CSS/JS; no build step;
-   opens from `file://`; no keys, tokens, or private paths baked in.
-6. **Verify before you deliver.** Re-read your own draft against rules 1–2. For an artifact: open the
-   HTML, confirm Mermaid parses and the SVG renders, confirm audio matches scene length. **If you
-   cannot verify a format here, ship a plainer one you can verify** (Mermaid → ASCII) and say why.
-   Gate: [references/checklist.md](references/checklist.md).
-7. **The medium must not lie.** Real numbers with units and sources. No invented data as a chart. No
-   stock footage implying it is real. Label every axis and arrow. **Check the facts that carry the
-   argument** against a primary source first — a confident wrong citation is worse than none.
-8. **Discardable, not disposable-looking.** One artifact per question per medium, written to a
-   sensible path (`./<slug>.html`, `./<slug>/`). No repo, no framework, no maintenance burden. A rung
-   1 answer plus a rung 2 diagram in chat is one reply, not two files.
-9. **Offer the uplevel; do not impose it.** Give the readable answer, then offer once. Ask before
-   anything that costs more than a few minutes of compute. Usually rung 1 was enough.
-10. **A dedicated skill changes *how*, never *which rung*.** Use a diagramming or video skill to
-    produce the rung already chosen — it does not raise the rung by itself, and it stays bound by the
-    budget rule. Three arrows do not become an interactive page because a diagramming skill exists.
+   meaning, no nominalizations. Default: **ASD-STE100 at about 80%** — the writing rules, ordinary
+   vocabulary, one clearly marked analogy. Read [references/writing.md](references/writing.md).
+3. **Shape before prose.** Name the document type, publish the verdict in the first ≤150 words, make
+   every heading a question the reader has, and name the scope fence. Read
+   [references/documents.md](references/documents.md).
+4. **Keep facts labelled.** Numbers carry units, sources, and a date. Assumptions are labelled
+   assumptions. Open questions are listed with a way to resolve each. Check the facts that carry the
+   argument against a primary source before delivering.
+5. **The artifact is the answer.** For rung 3, give the path, how to open it, and the verdict — do not
+   restate the document. At rung 1/2 the reply *is* the document: write it well and stop.
+6. **Self-contained or it does not count.** Single file; inline CSS/JS; no build step; opens from
+   `file://`; no keys, tokens, or private paths inside.
+7. **Verify before you deliver.** Run the reviewer's first pass from
+   [references/documents.md](references/documents.md) on your own draft. For rung 3, open the report
+   and confirm it renders. When this environment cannot verify a format, ship a plainer one you can
+   verify. Gate: [references/checklist.md](references/checklist.md).
+8. **One artifact per request.** Write to a sensible path (`./<slug>.md`, `./<slug>.html`). No
+   framework, no maintenance burden, no repo to clean up afterwards.
+9. **Offer the render once; do not impose it.** Give the readable document first, then offer the HTML
+   report where it will be re-read or circulated.
+10. **A dedicated skill changes *how*, never *which rung*.** Use a diagramming, document, or specs
+    skill to produce the rung already chosen — it does not raise the rung by itself.
 
 ## Choosing, in five questions
 
-1. **What can the reader do, decide, or restate afterwards?** "Explain it to someone else" and "stop
-   being confused" are valid answers; a pure explanation needs no downstream decision.
-2. **What shape is the content?** Sequence over time, static structure, a quantitative space, a
-   definition/procedure, or an invisible mechanism. Shape picks the rung.
-3. **Read once, or re-consulted and manipulated?** Read once → rung 1/2. Explored, stepped through, or
-   parameterized → rung 3.
-4. **What is the budget?** Under a minute of your own work → rung 1/2. Rung 4 is minutes-to-hours;
-   ask first.
-5. **What can you verify here?** If you cannot open or render a format in this environment, ship a
-   plainer one you can verify and say so.
+1. **Is this a document to be approved or worked from, or an answer to a question?** A document → the
+   shapes in [documents.md](references/documents.md). A question → rung 0/1 and stop.
+2. **Which shape fits?** Analysis, evaluation, execution plan, spec, ADR, runbook.
+3. **What must the reader be able to stop after?** That sentence is the summary at the top.
+4. **Does structure compress it?** Three or more parallel items → table. A flow, state, or structure →
+   one diagram.
+5. **Will it be re-read, circulated, or compared?** Those documents earn a single-file HTML report.
 
 ## Routing table
 
-| The content is… | Go to | Read |
+| The request is… | Go to | Read |
 |---|---|---|
-| **Anything you are about to write** | **cut it, then check clarity** — never skipped | [conciseness.md](references/conciseness.md) + [writing.md](references/writing.md) |
-| A term, contract, spec, or runbook to follow, quote, or grep | Rung 1 | [writing.md](references/writing.md) |
-| **A mechanism or process — "how does X work"** | **Rung 1 verdict + Rung 2 diagram** | [writing.md](references/writing.md) + [diagrams.md](references/diagrams.md) |
-| Structure, hierarchy, flow, state, sequence, or causal relation | Rung 2 | [diagrams.md](references/diagrams.md) |
-| A parameter space, a comparison, a "play with it" idea | Rung 3 | [html-pages.md](references/html-pages.md) |
-| An invisible mechanism unfolding over time, a proof sketch | Rung 4 — **only if the user opts in** | [video-explainers.md](references/video-explainers.md) |
-| A decision the reader must make | Rung 1 + Rung 2. Not a video. | [writing.md](references/writing.md) + [diagrams.md](references/diagrams.md) |
+| **A deliverable document: analysis, evaluation, plan, spec, ADR, runbook** | Rung 1 + the matching shape | [documents.md](references/documents.md) + [conciseness.md](references/conciseness.md) + [writing.md](references/writing.md) |
+| **Anything you are about to write** | cut it, then check clarity — never skipped | [conciseness.md](references/conciseness.md) + [writing.md](references/writing.md) |
+| A comparison or a trade-off between options | Evaluation shape: criteria before scores | [documents.md](references/documents.md) |
+| A procedure someone else will execute | Execution plan or runbook shape | [documents.md](references/documents.md) |
+| Structure, flow, state, sequence, or a decision matrix | Rung 2 — diagram | [diagrams.md](references/diagrams.md) |
+| A report that gets re-read, circulated, or carries several tables | Rung 3 — HTML report | [html-report.md](references/html-report.md) |
+| A term, contract, or spec the reader must quote or grep | Rung 1 | [writing.md](references/writing.md) |
+| "Explain how X works" | Rung 1 verdict plus one diagram | [writing.md](references/writing.md) + [diagrams.md](references/diagrams.md) |
 | One fact | Rung 0. Answer it. | — |
 
-**Tie-break: prose and diagram compose, not compete.** If two rows match, do rung 1 + rung 2.
+**Tie-break: prose and structure compose, they do not compete.** Tables and diagrams sit inside the
+document at the point where they replace paragraphs.
 
-Other references, opened only when relevant: [prompt-templates.md](references/prompt-templates.md)
-when the user wants a reusable prompt; [spirit.md](references/spirit.md) when the request is about
-the approach itself, not a topic.
+Other references, opened when relevant: [prompt-templates.md](references/prompt-templates.md) when the
+user wants a reusable prompt; [spirit.md](references/spirit.md) when the request is about the approach
+itself.
 
 ## Worked routing
 
-| Request | Rung | Why |
-|---|---|---|
-| "Explain how the TCP three-way handshake works." | 1 + 2 | A mechanism: a tight verdict in prose, one sequence diagram. |
-| "This doc is 4 pages and I still don't get it." | 1 (cut hard) | Readability problem — cut and restructure before adding anything. |
-| "Explain TCP slow start as an interactive page." | 3 | The user named the medium; parameters make it explorable. |
-| "I need the exact wording of the rate-limit contract." | 1 only | It must be quoted and grepped; a visual adds nothing. |
-| "What port does the health check use?" | 0 | One fact. |
+| Request | Output |
+|---|---|
+| "Write up an analysis of our auth layer and what we should do." | Project analysis; verdict first, options table, out of scope |
+| "Evaluate these three queue services for our workload." | Evaluation; criteria and weights published before the scorecard |
+| "Write the migration plan for moving off RabbitMQ." | Execution plan; phases with per-phase verification, rollback written up front |
+| "Turn what we just decided into a spec." | Spec; to-spec sections plus a decision summary and rejected alternatives |
+| "Why did we pick Postgres? Write it down." | ADR; one decision, consequences, reopen condition |
+| "This doc is 4 pages and I still don't get it." | Cut a third, add the verdict at the top, restructure the headings |
+| "Explain how TCP slow start works." | Secondary case: tight verdict plus one diagram |
+| "What port does the health check use?" | One line |
 
 ## Default move
 
-For "explain X": ① a cut-hard rung 1 verdict (answer first, ~80% STE), ② one diagram only if it
-replaces two or more paragraphs, ③ offer rung 3 once — and video only for a genuine mechanism
-unfolding over time.
-
-## Where video stands
-
-Video is rung 4: most expensive, hardest to patch, easiest to over-build. It is here because the
-source post is bullish on it and it is sometimes right — **not because it is what this skill is for.**
-If rung 4 looks like the fix for a problem that deleting 30% of the text would fix, drop back to
-rung 1.
+For a document request: ① pick the shape, ② write the ≤150-word verdict, ③ cut the body hard at ~80%
+STE, ④ add a table or one diagram where it replaces two paragraphs, ⑤ offer the HTML report once if
+the document will be re-read or circulated.
 
 ## Non-negotiables
 
-- Never answer "explain X" with a 900-word wall if 150 words plus one diagram carries it.
-- Never pad to look thorough. Exhaustiveness is a cost, not a service.
-- Never start a render longer than a few minutes without asking first.
-- Never deliver an artifact you have not opened or rendered yourself.
-- Never bake a key into a generated file; read credentials from the environment.
+- A document whose conclusion sits on the last page gets sent back.
+- No section that answers a question the reader does not have.
+- No assumption written as a fact, and no scorecard without published criteria.
+- No execution plan without rollback and per-phase verification.
+- No artifact delivered unopened, and no credential written inside one.

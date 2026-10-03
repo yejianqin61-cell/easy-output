@@ -94,8 +94,7 @@ Do not climb the ladder out of text when the reader needs:
 - exact wording they will quote, copy, or comply with;
 - something greppable, diffable, or reviewable in a PR;
 - normative force (MUST / SHALL / MAY);
-- density — a page of text can hold more facts than a minute of video, and the reader can skim it
-  non-linearly;
+- density — a page of text holds more facts than one diagram, and the reader can skim it non-linearly;
 - to paste it somewhere else.
 
 Text is also the only rung that is trivially patchable. If the content will change tomorrow,

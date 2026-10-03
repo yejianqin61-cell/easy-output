@@ -42,7 +42,8 @@ is another sentence they must decide to skip.
 ## Length budgets
 
 Rough targets. Over-running them is a signal, not a crime — but "why is this longer?" must have an
-answer.
+answer. Budgets for the engineering document types — analysis, evaluation, execution plan, spec, ADR,
+runbook — live in [documents.md](documents.md).
 
 | Output | Target |
 |---|---|

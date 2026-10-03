@@ -1,164 +1,142 @@
 # Prompt templates
 
-Copy, paste, adapt the bracketed parts. They are written for an agent with this skill loaded, and
-they also work on a plain chat model.
+Copy, paste, adapt the bracketed parts. Order matters: **cut, clarify, shape, then render.**
 
-The order matters: **cut first, clarify second, change medium third.** Most of the value is in
-templates 0–3, which cost nothing and fix the majority of bad output.
+Templates 0–2 carry the most value and cost nothing.
 
-## 0. The universal opener
+## 0. Universal opener
 
-> Before you answer: make this as readable as it can be. Cut anything that does not change what I
-> know or do, put the answer in the first sentence, and prefer a list or a table over prose for
-> parallel items. Then, if a diagram would read faster than two paragraphs of text, say so and give
-> me one. Do not build a page or a video unless I ask, and tell me the cost first if it would take
-> more than a couple of minutes.
+> Before you answer, make this a document I can approve in two minutes. Open with the verdict — the
+> recommendation, its cost, its main risk, and what you need from me — in 150 words or less. Make
+> every heading a question I have. Give me an out-of-scope section, and label every assumption.
+> Cut anything that does not change what I know or do. Add a table or a diagram where it replaces two
+> paragraphs. Offer me an HTML report if the document will be re-read, and ask before anything that
+> takes more than a couple of minutes.
 
-## 1. Cut and rewrite for readability
+## 1. Cut and rewrite
 
-> Rewrite the text below so it is short and clear, without losing information I need.
+> Rewrite the text below so I can approve it, keeping every fact I need.
 >
-> - Put the conclusion in the first one or two sentences.
-> - Delete the preamble, the restatement of my question, any recap (the text is short), hedges, and
->   "it's worth noting" filler.
+> - Verdict in the first one or two sentences.
+> - Delete the preamble, the restatement of my question, recaps, hedges, and "it's worth noting".
 > - One idea per sentence. Active voice. No nominalizations.
 > - Three or more parallel items become a list; items compared on the same attributes become a table.
-> - Target length: [150 words / one screen]. If you must exceed it, tell me why in one line.
-> - Then show me, as a short list, what you deleted and why. If you deleted something that mattered,
->   say so.
+> - Target length: [150 words / one screen]. Tell me in one line if it must run longer.
+> - Then list what you deleted and why. Flag anything that turned out to matter.
 >
 > [paste text]
 
-## 2. Rung 1 — ASD-STE100, full strength
+## 2. Retrofit an existing document
 
-> Explain [topic] in ASD-STE100 (Simplified Technical English). Follow the writing rules and use the
-> approved vocabulary. Maximum 20 words per sentence for instructions, 25 for description. One
-> instruction per sentence. Active voice. Simple tenses. One word for one meaning, and use the same
-> word every time. No idioms, metaphor, or humor. Keep the articles. Explain it to [audience], who
-> already knows [assumed background].
+> This document is [N] pages and I still cannot approve it. Rewrite it: verdict in the first 150
+> words, headings turned into my questions, a third of it cut, every assumption labelled, an
+> out-of-scope section added. Leave the facts and the numbers unchanged.
 
-## 3. Rung 1 — the 80% dial (default for explanations)
+## 3. Project analysis
 
-> Explain [topic] at about **80% of the way to ASD-STE100**. Keep the discipline: short sentences, one
-> idea per sentence, active voice, simple tenses, one word for one meaning, no nominalizations. Drop
-> the stiffness: normal vocabulary is fine, and you may use exactly **one** analogy, clearly marked as
-> an analogy. Put the conclusion first. Do not pad. Target [N] words.
-
-## 4. Rung 1 — self-audit
-
-> Review the text you just wrote as a hostile editor, in two passes.
+> Write a project analysis of [subject].
 >
-> Pass 1 — conciseness: for every sentence, does it change what I know or do? List the sentences that
-> fail and delete them.
-> Pass 2 — clarity: check one word per meaning, active voice, sentence length, one instruction per
-> sentence, noun clusters ≤ 3 words, no nominalizations, no idioms.
+> - Verdict first: recommendation, cost, main risk, in ≤150 words.
+> - Current state: the facts and numbers needed to judge that verdict, with sources.
+> - Problem: what the current state costs, quantified where possible.
+> - Options: a table of option / cost / what it buys / what it breaks.
+> - Recommendation and rationale, including which alternatives you closed off.
+> - Risks and unknowns, each with a mitigation or a resolution path.
+> - Out of scope.
 >
-> Give me the corrected version and a list of what you changed. Add no new information.
+> Target [600–1200] words. Skip the chronological account of your research.
 
-## 5. Rung 2 — diagram, type-first
+## 4. Evaluation
 
-> Draw [the process / the state machine / the interaction / the data model] for [subject] as a diagram.
+> Evaluate [candidates] for [purpose].
 >
-> - First tell me the one claim the diagram makes.
-> - Choose the diagram type that fits the relation, and say why.
-> - Output Mermaid inside a ` ```mermaid ` fence. If it renders on GitHub, prefer that syntax.
-> - Every arrow needs a label. Every node label must match the real names in [codebase/doc].
-> - Maximum ~12 top-level nodes; group the rest.
-> - Give me a title and a one-sentence caption that states the takeaway.
-> - Then verify your own Mermaid: check the syntax, and tell me how I should render it.
-
-## 6. Rung 2 — quick shape in chat
-
-> Before you explain, draw the shape of [subject] as ASCII box art, ≤ 100 characters wide, in a fenced
-> code block. One diagram, one claim. Then give me 4 sentences at 80% ASD-STE100 — and only if the
-> diagram does not already say it.
-
-## 7. Rung 3 — single-file interactive explainer
-
-> Build a single self-contained HTML file that explains [topic] to [audience].
+> - Publish the criteria and their weights **before** any scores.
+> - Scorecard: one row per candidate, one column per criterion, weighted total.
+> - Evidence per criterion — only the evidence that moves the ranking.
+> - Sensitivity: what would reverse the decision. Name the threshold.
+> - Unknowns, each with a way to resolve it.
+> - Out of scope.
 >
-> Requirements:
-> - One file. Inline CSS and JS. No build step, no framework, no CDN needed for the content to work.
->   It must open from `file://` and work offline.
-> - Title = the claim, not the topic. Start with a 3–5 sentence TL;DR written at 80% ASD-STE100.
-> - Sections are the questions I actually have, in order: intuition → mechanism → **try it** → where
->   this breaks. No introduction section and no conclusion section.
-> - The "try it" section is the point: give me [a slider over X / a scrubber over time / a toggle
->   comparing A and B / a step-through of the stages] with a live readout.
-> - Real numbers only, with units and sources. If a value is illustrative, label it in the page.
-> - System font stack, 16–20px body, responsive down to 375px, `prefers-color-scheme` and
->   `prefers-reduced-motion` respected, keyboard accessible, visible focus.
-> - Footer: what was generated, sources, date.
-> - Then open it (or screenshot it), check the console is clean, and tell me what you saw. Do not hand
->   it over without rendering it.
+> Mark judgement as judgement, and trace every score to evidence in this document.
+
+## 5. Execution plan
+
+> Write the execution plan for [goal].
 >
-> Save it as `[slug].html` and reply with: path, how to open it, the takeaway, what to try first.
-
-## 8. Rung 3 — turn an existing artifact into a page
-
-> Take the diagram/text above and turn it into a single-file interactive HTML page. The interaction
-> must add understanding, not decoration: let me [step through the stages / vary the parameter /
-> toggle the two models]. Keep every fact identical; cut anything that does not earn its place; do not
-> invent data to make the page richer.
-
-## 9. Rung 4 — explainer video, full pipeline
-
-> Create a [60–180] second [3Blue1Brown / Manim] style explainer video on [topic].
+> - Objective and a checkable definition of done.
+> - Prerequisites and assumptions.
+> - Phases: numbered steps, imperative, one action each with its expected result. Every phase closes
+>   with a verification step.
+> - Interfaces and handoffs.
+> - Rollback per phase, written before the work starts.
+> - Risks and mitigations, then what we are not doing.
 >
-> Process, in this order:
-> 1. Write `script.md`: per-scene narration and on-screen text. One idea per scene. Beats: hook →
->    intuition → mechanism → numbers → recap + caveat. Nothing on screen that isn't in the script.
-> 2. Generate the narration **per scene** as separate audio files with [ElevenLabs, reading my
->    `ELEVENLABS_API_KEY` from the environment / a free local TTS — see below]. Never hardcode the key,
->    and never write it into a file.
-> 3. Measure each scene's audio duration and **drive the animation timing from it**. Audio is the clock.
-> 4. Render the visuals with [Manim CE / Remotion]. Precise geometry; two or three colours; motion that
->    *is* the explanation.
-> 5. Render a **480p draft first** and let me watch it before the final render.
-> 6. Mux audio and video with ffmpeg, add captions from the narration timestamps.
+> Every step must be executable by someone holding only this document.
+
+## 6. Spec (to-spec compatible)
+
+> Turn what we decided into a spec. Do not interview me; synthesize what is already settled.
 >
-> Deliver `explainer.mp4`, `poster.png`, and `script.md`. Tell me the total render time before you
-> start, and ask me before any step that will run longer than a few minutes.
+> - Decision summary at the top, ≤150 words: the shape of the solution and what was refused.
+> - Problem statement, solution, decisions made, testing decisions, out of scope, open questions.
+> - Each decision on one line, with the alternative it beat beside it.
+> - Keep the body dense — the implementing agent reads it end to end.
 
-## 10. Rung 4 — free / local audio instead of a paid key
+## 7. ADR
 
-> I do not have an ElevenLabs key. Find me the best currently available **free** TTS options that can
-> run on my own machine, with their licences, then use the best one for this video. Prefer permissive
-> licences (MIT / Apache-2.0) if I might publish the result. If you need to download a model or install
-> a package, tell me the size and ask first. Do not stop the task because an API key is missing — route
-> around it.
+> Write an ADR for [decision]. Title = the decision. Status and date. Context in three to five
+> sentences. The decision. The alternatives and why they lost. Consequences: what gets easier, what
+> gets harder, what is now constrained. The condition that would reopen it. 200–500 words, one
+> decision per file.
 
-## 11. Rung 4 — script only (cheap gate)
+## 8. Runbook
 
-> Before any rendering: give me the video as a script only — per scene, narration text plus a
-> description of what moves on screen, with estimated durations. No code yet. I will approve the
-> script, and only then do we render.
+> Write the runbook for [operation]. Imperative sentences, one action per step, each with the exact
+> command and the expected output. Then verification, rollback, failure modes with escalation, and
+> out of scope. No narrative, and the first screen states the effect and the risk.
 
-## 12. Verification pass
+## 9. Single-file HTML report
 
-> Review the artifact you just produced as a hostile reviewer. For [text: check length against the
-> budget and cut anything that does not change what I know / HTML: open it and check console errors,
-> layout at 375px and 1440px, keyboard access, dark mode, reduced motion, offline use / video: check
-> the last frame, scene-boundary sync, total runtime, caption match / diagram: check it parses, every
-> edge label, ≤12 nodes, labelled axes].
-> List what is broken, fix it, then tell me what you fixed. Do not claim it works without checking.
+> Render this document as a single self-contained HTML report.
+>
+> - One file, inline CSS and JS, no framework, no build step, opens from `file://` and works offline.
+> - Verdict block at the top with the same wording as the Markdown version, then a table of contents.
+> - Sections are the headings from the document; no new content.
+> - Sortable tables where there are several; `<details>` for evidence a reviewer may skip; the numbers
+>   stay in the markup so the print view carries them too.
+> - Print stylesheet: nav dropped, `<details>` expanded, tables kept off page breaks.
+> - System font stack, 16–20px body, responsive to 375px, `prefers-color-scheme` and
+>   `prefers-reduced-motion` respected, keyboard accessible.
+> - Footer: sources, generation date, what was generated.
+> - Then open it (or screenshot it), check the console, and tell me what you saw.
+>
+> Save as `[slug].html` and reply with the path, the verdict in one line, and what to read first.
 
-## 13. One-line uplevel offer
+## 10. Self-review — the reviewer's first pass
 
-> Want this as [an interactive page / a 90-second explainer video]? It would cost about [estimate] to
-> make. Say the word. — If what you actually want is just less text, I can cut this by a third instead.
+> Review your own draft the way the reviewer will. Can I disagree with the verdict from the summary
+> alone? Is every heading a question I have? Is the out-of-scope section real? Is every assumption
+> labelled, and does every number carry a source? Cut a third, then show me what you removed. Add no
+> new information.
 
-## 14. Stop signal — when text is right
+## 11. Explanation — the secondary case
 
-> Stay in text. I need [exact wording I can quote / something I can put in a PR / something I can grep].
-> Do not build a page or a video. Just make it short and clear.
+> Explain [topic] at about 80% of the way to ASD-STE100: verdict in the first two sentences, one idea
+> per sentence, active voice, short sentences, one clearly marked analogy allowed. Then one diagram if
+> it replaces two paragraphs. Target [N] words.
+
+## 12. One-line offer
+
+> Want this as a single-file HTML report you can circulate? Roughly [estimate] to produce.
+
+## 13. Stop signal
+
+> Keep it to a memo. One screen, pasteable into the tracker, verdict first.
 
 ## Notes on using these
 
-- **Do templates 0–3 first.** They are free, and they fix most bad output. Everything above rung 2 is
-  a deliberate investment.
-- Keep the **medium decision** in the prompt, but after the readability instruction — not instead of it.
-- Always ask for the **draft pass** on rung 3 and 4. Cheap, and it catches most failures.
-- Always ask for the **artifact plus its source file** (`script.md` for video). The video is
-  discardable; the script is what you keep.
-- If the artifact looks good but you cannot open it, it is not done — go back to template 12.
+- Run template 0 or 1 first. It is free, and it fixes most documents.
+- Name the document type early. The shape carries more of the quality than any wording polish.
+- Ask for the **draft pass** on rung 3. It catches most rendering failures.
+- Deliver the artifact plus its source file, so the content stays greppable and patchable.
+- If a document looks good but you cannot open it, it is not done. Go back to template 10.

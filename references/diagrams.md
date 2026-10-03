@@ -36,7 +36,7 @@ answers nothing.
    ship Mermaid you have not rendered. If there is no Mermaid renderer in your environment, fall
    back to ASCII: shipping syntax you cannot check is worse than a plainer figure you can.
 3. **Standalone SVG / single-file HTML.** Best when the diagram will be re-consulted, explored,
-   zoomed, or shared. See [html-pages.md](html-pages.md) for the page shell; inline the SVG so the
+   zoomed, or shared. See [html-report.md](html-report.md) for the report shell; inline the SVG so the
    file stays portable.
 
 Rule of thumb: **say it in chat → ASCII. Keep it in a repo → Mermaid. Re-consult it or explore it →

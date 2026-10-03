@@ -1,9 +1,11 @@
 # easy-output
 
-An Agent Skill that raises the readability of an agent's output: cut the filler, write in
-constrained English, then pick the cheapest medium that carries the idea — table, diagram,
-single-file page, or video. Targets explanations, summaries, design docs, hand-off notes, and PR
-descriptions.
+Makes an agent's engineering documents readable in minutes and dense enough to build from: project
+analysis, evaluation, execution plans, specs, ADRs, runbooks. Verdict first, headings that answer the
+reader's questions, an explicit scope fence, and ASD-STE100-grade clarity at ~80% strength.
+
+Built on Andrej Karpathy's advice about LLM output, applied to the documents a person has to approve.
+Sits as a readability layer over Matt Pocock's [`to-spec`](https://github.com/mattpocock/skills).
 
 Follows the [Agent Skills](https://agentskills.io/) format. Markdown only; no scripts, no
 dependencies.
@@ -38,44 +40,64 @@ git clone https://github.com/yejianqin61-cell/easy-output.git ~/.claude/skills/e
 git clone https://github.com/yejianqin61-cell/easy-output.git .claude/skills/easy-output     # project
 ```
 
+## What it produces
+
+| Document | Reader | The question it answers |
+|---|---|---|
+| **Project analysis** 项目分析 | whoever commits effort or budget | what is the state, what it costs, what we recommend |
+| **Evaluation** 评估 | the decision-maker | which option wins, on what criteria, what would reverse it |
+| **Execution plan** 施工计划 | the executor and the approver | what happens, in what order, how we know it is done |
+| **Spec** 规格 | the implementing agent, plus the reviewer | what problem, what solution, which decisions are locked |
+| **ADR** 决策记录 | a future maintainer | why it is like this |
+| **Runbook** 操作手册 | someone under time pressure | how to run it, undo it, and tell that it broke |
+
+Skeletons, section lists, and length budgets for all six are in
+[`references/documents.md`](references/documents.md).
+
+## The document contract
+
+Eight rules, applied to every type. The first one is what makes a document approvable:
+
+1. **Decision-first.** The verdict — recommendation, cost, main risk, the ask — lands in the first
+   ≤150 words. A reviewer who stops there still knows where the document stands.
+2. Headings are the reader's questions, in the order the reader asks them.
+3. One screen, one idea.
+4. An out-of-scope section naming what was deliberately declined.
+5. Assumptions labelled as assumptions; open questions listed with a way to resolve each.
+6. Numbers carry units, sources, and a date.
+7. A status line: type, date, status, the decisions this document locks.
+8. A dense body with a navigable surface — the summary and headings are the human interface.
+
 ## How it works
 
-Three passes, in order. The first two are free and carry most of the value.
+Four steps, in order. The first three are free.
 
-| Pass | What it does | Cost |
-|---|---|---|
-| **Cut** | Drops preamble, restated questions, recaps, hedges. Puts the answer in the first sentence. Swaps prose for tables and lists on parallel items. | none |
-| **Clarify** | One idea per sentence, active voice, one word for one meaning, no nominalisations. ASD-STE100 at ~80%: its writing rules, ordinary vocabulary, one clearly marked analogy. | none |
-| **Re-render** | Picks the medium that reads best at that density. | minutes to hours |
+| Step | What it does |
+|---|---|
+| **Cut** | Drops preamble, restated questions, recaps, hedges. Prefers a table to a paragraph for parallel items. |
+| **Clarify** | One idea per sentence, active voice, one word for one meaning, no nominalizations. ASD-STE100 at ~80%: its writing rules, ordinary vocabulary, one clearly marked analogy. |
+| **Shape** | Picks the document type, writes the verdict, orders headings as the reader's questions, fences the scope. |
+| **Render** | Tables and one or two diagrams where they replace paragraphs; a single-file HTML report when the document gets re-read or circulated. |
 
-The media it chooses between:
-
-| Rung | Output | Adds | Cost |
-|---|---|---|---|
-| 0 | Chat prose | speed, diffs, grep | seconds |
-| 1 | Constrained, cut prose | clarity and concision together | — |
-| 2 | Diagram | structure, compression | minutes |
-| 3 | Single-file interactive HTML | exploration, parameter control, self-paced animation | tens of minutes |
-| 4 | Custom explainer video | narrative, motion, timing | hours, plus TTS |
-
-Rungs 0–2 cover most requests. Rung 3 suits content the reader has to explore. Rung 4 is opt-in: the
-agent proposes it for a mechanism that unfolds over time, and asks about the cost first.
+The rungs run 0–3: a few sentences, a cut document, a document plus structure, a document plus an
+HTML report. Rung 1 carries the value. Stop at the rung where the human can approve the document.
 
 ## Usage
 
-The skill triggers on its own when you ask for an explanation or flag that output is hard to read.
-It also fires before the agent sends a draft that has run long.
+The skill triggers on its own when you ask for a document or flag that one is unreadable. It also
+fires before the agent sends a draft that has run long.
 
 ```
-Explain how TCP slow start works.                          → rung 1, cut hard, plus one diagram
-This doc is 4 pages and I still don't get it.              → cut a third, restructure
-Explain our retry/backoff logic as a page I can play with. → rung 3
-Make a 90-second 3b1b-style explainer on eigenvalues.      → rung 4, after the cost question
-What port does the health check use?                       → one line
+Write up an analysis of our auth layer and what we should do.   → project analysis, verdict first
+Evaluate these three queue services for our workload.           → criteria and weights before scores
+Write the migration plan for moving off RabbitMQ.               → phases, per-phase verification, rollback
+Turn what we just decided into a spec.                          → spec plus a decision summary
+Why did we pick Postgres? Write it down.                        → ADR, one decision
+This doc is 4 pages and I still don't get it.                   → cut a third, verdict at the top
+Explain how TCP slow start works.                               → the secondary case: verdict + diagram
 ```
 
-Copy-paste prompts for every rung live in
-[`references/prompt-templates.md`](references/prompt-templates.md); template 1 is the cut pass.
+Prompts for each document type are in [`references/prompt-templates.md`](references/prompt-templates.md).
 
 ## Structure
 
@@ -83,44 +105,39 @@ Copy-paste prompts for every rung live in
 easy-output/
 ├── SKILL.md                    # rungs, 10 operating rules, 5 selection questions, routing table
 └── references/
-    ├── conciseness.md          # cutting: BLUF, length budgets, techniques, anti-patterns
+    ├── documents.md            # the document contract and the six shapes
+    ├── conciseness.md          # cutting: verdict first, length budgets, techniques, anti-patterns
     ├── writing.md              # ASD-STE100 rules, the 80% dial, before/after pairs
     ├── diagrams.md             # relation → diagram type; ASCII, Mermaid, SVG
-    ├── html-pages.md           # single-file contract, interaction patterns
-    ├── video-explainers.md     # 3b1b decoding, audio-first timing, TTS options and licences
-    ├── prompt-templates.md     # prompts per rung, cut pass first
-    ├── checklist.md            # per-rung verification gate
-    └── spirit.md               # source post, 10 principles, guardrails
+    ├── html-report.md          # single-file report contract, print stylesheet, interaction
+    ├── prompt-templates.md     # prompts per document type, cut pass first
+    ├── checklist.md            # the reviewer's first pass, per rung
+    └── spirit.md               # source post, principles, and what this repo takes from it
 ```
 
 `SKILL.md` holds the routing and pulls in a `references/` file only when the rung calls for it.
 
 ## Operating rules
 
-- Cut first. A 900-word draft that 150 words could carry has a text problem, and diagrams rarely
-  rescue it.
-- Verify before delivering. Re-read the draft against the rules; open the HTML, render the Mermaid,
-  watch the draft render, measure the audio against scene length. When the environment can't verify
-  a format, ship the plainer one.
-- Ask before expensive work. Rung 4 runs minutes to hours, and the user signs off on the cost.
-- Keep artifacts honest. Real numbers with units and sources, labeled axes, citations checked
-  against a primary source.
-- Read credentials from the environment (`ELEVENLABS_API_KEY`).
-- A diagramming or office-document skill changes *how* a rung gets built; the rung itself stays put.
+- Verdict first. A document whose conclusion sits on the last page gets sent back.
+- Cut before decorating. A 900-word draft that 150 words could carry has a text problem.
+- Criteria before scores. An evaluation with no reversal condition is advocacy.
+- Rollback before work. A plan with no per-phase verification cannot be executed by anyone else.
+- Label assumptions, source numbers, fence the scope.
+- Walk the reviewer's first pass on your own draft, and open the report before delivering it.
+- Ask before a render that takes more than a few minutes, and read credentials from the environment.
 
 ## Provenance
 
-Compressed from Andrej Karpathy's post of 2 October 2026 on understanding LLM output:
-<https://x.com/karpathy/status/2105819303471976479>, quoted in full in
-[`references/spirit.md`](references/spirit.md). This repository is an independent interpretation, and
-the author has not reviewed or endorsed it. The emphasis on readability and conciseness, and rung 4's
-opt-in status, are this repository's editorial choices.
+Two sources. The writing standard comes from Andrej Karpathy's post of 2 October 2026 on making LLM
+output easier to understand: <https://x.com/karpathy/status/2105819303471976479>, quoted in full in
+[`references/spirit.md`](references/spirit.md). The document shapes build on
+[`to-spec`](https://github.com/mattpocock/skills) by Matt Pocock (MIT), which turns a conversation into
+a spec for the agent that will implement it; this repository adds the layer that makes the same
+document auditable by a human. Neither author has reviewed or endorsed this repository.
 
 ASD-STE100 is published by the ASD at <https://www.asd-ste100.org/>.
 [`references/writing.md`](references/writing.md) paraphrases its well-known rules for practical use.
-
-3Blue1Brown, Manim, ElevenLabs, Kokoro, Piper, XTTS, and Remotion are the property of their
-respective owners, referenced descriptively.
 
 ## License
 
@@ -128,7 +145,7 @@ respective owners, referenced descriptively.
 
 ## Contributing
 
-Issues and PRs welcome; keep them small. Contributions that land well: a conciseness technique that
-held up in practice, a sharper before/after STE pair, a verification step that caught a real failure,
-a corrected tool or licence detail. Keep it dependency-free, keep `SKILL.md` thin, and keep this
-README short — it gets read first.
+Issues and PRs welcome; keep them small. Contributions that land well: a sharper before/after STE
+pair, a document shape that earns its sections, a verification step that caught a real failure, a
+corrected fact or licence detail. Keep it dependency-free, keep `SKILL.md` thin, and keep this README
+short — it is the first thing a reader sees.
