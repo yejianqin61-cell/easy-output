@@ -104,7 +104,8 @@ easy-output/
     ├── conciseness.md          # 砍：结论先行、长度预算、手法、反模式
     ├── writing.md              # ASD-STE100 规则、80% 旋钮、改写对照
     ├── diagrams.md             # 关系 → 图型；ASCII、Mermaid、SVG
-    ├── html-report.md          # 单文件报告契约、打印样式、交互
+    ├── html-report.md          # 第 3 档：怎么填模板、class 词表
+    ├── report-template.html    # 固定设计系统，agent 只填内容
     ├── prompt-templates.md     # 每种文档的提示词，"砍"放第一条
     ├── checklist.md            # 评审者的第一遍通读清单
     └── spirit.md               # 原始帖子、原则、本仓库从中取用了什么
@@ -120,6 +121,8 @@ easy-output/
 - 回滚先于开工。没有逐阶段验证的计划，别人照着执行不了。
 - 假设要标注，数字要带来源，scope 要有边界。
 - 交付前自己走一遍"评审者第一遍通读"，报告要先打开看过。
+- 每次交付 Markdown 文档，结尾都要问一句：要不要一份 HTML 报告？说了要才做。
+- 不给报告模板加 CSS，交付物里不留 `{{` 标记。
 - 超过几分钟的渲染先问一声；凭据从环境变量读。
 
 ## 出处

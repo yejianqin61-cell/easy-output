@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="{{LANG}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}}</title>
+<!--
+  easy-output report template. The style block below is the design system: keep it unchanged.
+  1. Replace the SLOT comments and the TOKEN placeholders in the body.
+  2. Delete every comment before delivering.
+  3. Add no CSS. Only the custom properties --v, --max and --cols may be set inline.
+  4. See references/html-report.md for the slot list and the class vocabulary.
+-->
+<style>
+:root{
+  --radius:6px;
+  --bw:1px;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"JetBrains Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  --bg:#f7f7f5; --paper:#ffffff; --ink:#16181d; --ink2:#4b5260; --ink3:#8b929e;
+  --line:#1d2026; --line2:#dfe3e8; --fill:#f2f4f7;
+  --accent:#1d5fbf; --accent-bg:#e8eff9;
+  --ok:#1a7f4b; --ok-bg:#e8f5ee;
+  --warn:#93600a; --warn-bg:#fdf4e3;
+  --err:#b3261e; --err-bg:#fbeceb;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#0b1220; --paper:#111a2b; --ink:#e8eef8; --ink2:#a9b8cc; --ink3:#6b7f99;
+    --line:#c9d6e8; --line2:#22304a; --fill:#16233a;
+    --accent:#7cb0ff; --accent-bg:#16305a;
+    --ok:#5ddc95; --ok-bg:#0f3a26;
+    --warn:#f0b14a; --warn-bg:#3a2a10;
+    --err:#ff8a80; --err-bg:#3d1518;
+  }
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;padding:40px 24px 64px;background:var(--bg);color:var(--ink);font:15px/1.6 var(--sans)}
+.doc{max-width:1100px;margin:0 auto}
+p{margin:0;max-width:72ch}
+ul,ol{margin:0;padding-left:20px;max-width:72ch}
+li+li{margin-top:4px}
+a{color:var(--accent)}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:2px}
+strong{font-weight:650}
+
+/* one rhythm rule for every sibling pair: margin-collapse bugs become impossible */
+.sec-body > * + *{margin-top:14px}
+.verdict-body > * + *{margin-top:10px}
+.body > .sec + .sec{margin-top:18px}
+
+.head{margin-bottom:28px;padding-bottom:20px;border-bottom:var(--bw) solid var(--line2)}
+.kicker{margin:0 0 8px;font:600 12px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+h1{margin:0 0 8px;font-size:26px;line-height:1.25;letter-spacing:-.01em}
+.sub{margin:0 0 18px;font-size:15px;color:var(--ink2)}
+h2{margin:0 0 10px;font-size:17px;line-height:1.35}
+h3{margin:18px 0 6px;font-size:15px}
+h2 + h3,h3:first-child{margin-top:0}
+
+.meta{display:flex;flex-wrap:wrap;gap:0 28px;margin:0;padding:0;border-top:var(--bw) solid var(--line2);border-bottom:var(--bw) solid var(--line2)}
+.meta > div{display:flex;gap:8px;align-items:baseline;padding:8px 0}
+.meta dt{margin:0;font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink2)}
+.meta dd{margin:0;font-size:13px}
+
+.verdict{margin:0 0 24px;padding:16px 18px;background:var(--paper);border:var(--bw) solid var(--line);border-left:4px solid var(--accent);border-radius:var(--radius)}
+.verdict-title{margin:0 0 8px;font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.verdict-body{font-size:16px}
+
+.toc{margin:0 0 28px}
+.toc-title{margin:0 0 8px;font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink2)}
+.toc ol{display:flex;flex-wrap:wrap;gap:6px 20px;padding:0;list-style:none;max-width:none}
+.toc a{font-size:13px;text-decoration:none;border-bottom:var(--bw) solid var(--line2);padding-bottom:2px}
+.toc a:hover{border-bottom-color:var(--accent)}
+
+.sec{padding:18px 20px;background:var(--paper);border:var(--bw) solid var(--line2);border-radius:var(--radius)}
+
+.table-wrap{overflow-x:auto}
+table.data{width:100%;border-collapse:collapse;font-size:14px}
+.data th,.data td{padding:7px 10px;text-align:left;vertical-align:top;border-bottom:var(--bw) solid var(--line2)}
+.data th{font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);border-bottom-color:var(--line)}
+.data tr:last-child td{border-bottom:0}
+.data .num{text-align:right;font-variant-numeric:tabular-nums}
+.st{display:inline-flex;gap:5px;align-items:center;font-weight:600;white-space:nowrap}
+.st--ok{color:var(--ok)}
+.st--ok::before{content:"\2713"}
+.st--no{color:var(--err)}
+.st--no::before{content:"\2717"}
+.st--warn{color:var(--warn)}
+.st--warn::before{content:"!"}
+
+.callout{padding:12px 14px;background:var(--accent-bg);border:var(--bw) solid var(--line2);border-left:4px solid var(--accent);border-radius:var(--radius)}
+.callout-title{margin:0 0 4px;font-size:13.5px;font-weight:650}
+.callout--ok{background:var(--ok-bg);border-left-color:var(--ok)}
+.callout--warn{background:var(--warn-bg);border-left-color:var(--warn)}
+.callout--err{background:var(--err-bg);border-left-color:var(--err)}
+
+.flow{display:flex;flex-direction:column;gap:0}
+.flow-step{position:relative;padding:0 0 18px 22px;border-left:var(--bw) solid var(--line2)}
+.flow-step:last-child{padding-bottom:0;border-left-color:transparent}
+.flow-step::before{content:"";position:absolute;left:-4px;top:6px;width:7px;height:7px;border-radius:50%;background:var(--accent)}
+.flow-step .step-label{display:block;font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink2)}
+.flow-step p{margin-top:4px}
+
+.grid-2,.grid-3{display:grid;gap:14px}
+.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.card{padding:12px 14px;background:var(--paper);border:var(--bw) solid var(--line2);border-radius:var(--radius)}
+.card h3{margin:0 0 6px;font-size:14px}
+.card p{font-size:13.5px}
+
+.bars{display:grid;gap:10px}
+.bar{display:grid;grid-template-columns:minmax(120px,180px) 1fr auto;gap:12px;align-items:center}
+.bar-label{font-size:13.5px}
+.bar-track{height:10px;background:var(--fill);border-radius:4px;overflow:hidden}
+.bar-fill{display:block;height:100%;width:calc(var(--v) / var(--max) * 100%);background:var(--accent)}
+.bar-fill--over{background:var(--err)}
+.bar-value{font:12.5px var(--mono);font-variant-numeric:tabular-nums;color:var(--ink2)}
+
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:0}
+.kv dt{font:600 12px var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--ink2)}
+.kv dd{margin:0;font-size:13.5px}
+
+code{font:12.5px/1.5 var(--mono);padding:1px 5px;background:var(--fill);border:var(--bw) solid var(--line2);border-radius:4px}
+pre{margin:0;padding:12px 14px;overflow-x:auto;background:var(--fill);border:var(--bw) solid var(--line2);border-radius:var(--radius)}
+pre code{padding:0;background:none;border:0}
+
+figure.diagram{margin:0}
+/* SVG rule: coordinates on a 20px grid, stroke/fill only from the variables above. */
+.diagram svg{display:block;max-width:100%;height:auto}
+.diagram figcaption{margin-top:6px;font-size:12.5px;color:var(--ink2)}
+
+.colophon{margin-top:36px;padding-top:12px;border-top:var(--bw) solid var(--line2);font:12px/1.6 var(--mono);color:var(--ink3)}
+
+@media (max-width:760px){
+  body{padding:28px 14px 40px}
+  .grid-2,.grid-3{grid-template-columns:1fr}
+  .bar{grid-template-columns:1fr auto;gap:6px 12px}
+  .bar-track{grid-column:1 / -1;order:3}
+  h1{font-size:22px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
+@media print{
+  body{padding:0;background:var(--paper)}
+  .toc{display:none}
+  .sec,.verdict,.card{break-inside:avoid}
+  .table-wrap{overflow:visible}
+  .colophon{color:var(--ink2)}
+}
+</style>
+</head>
+<body>
+<main class="doc">
+
+  <header class="head">
+    <p class="kicker"><!-- SLOT: document type, e.g. "Project analysis" -->{{DOC_TYPE}}</p>
+    <h1><!-- SLOT: the claim, not the topic -->{{TITLE}}</h1>
+    <p class="sub"><!-- SLOT: one line of context. Delete this element when unused. -->{{SUBTITLE}}</p>
+    <dl class="meta">
+      <!-- SLOT: 3-5 rows. Delete any row you do not have a value for. -->
+      <div><dt>Status</dt><dd>{{DRAFT|FOR REVIEW|APPROVED}}</dd></div>
+      <div><dt>Date</dt><dd>{{YYYY-MM-DD}}</dd></div>
+      <div><dt>Locks</dt><dd>{{the decisions this document settles}}</dd></div>
+      <div><dt>Source</dt><dd>{{where the numbers came from}}</dd></div>
+    </dl>
+  </header>
+
+  <section class="verdict">
+    <p class="verdict-title"><!-- SLOT: the verdict heading -->{{VERDICT_HEADING}}</p>
+    <div class="verdict-body">
+      <!-- SLOT: <=150 words. Recommendation, cost, main risk, what is asked of the reader.
+           This is the only part a reviewer is required to read. -->
+      {{VERDICT}}
+    </div>
+  </section>
+
+  <nav class="toc">
+    <p class="toc-title">{{CONTENTS}}</p>
+    <ol>
+      <!-- SLOT: one <li><a href="#sec-N">N · heading</a></li> per section, in order. -->
+      <li><a href="#sec-1">{{1 · heading}}</a></li>
+    </ol>
+  </nav>
+
+  <article class="body">
+    <!-- SLOT: one <section class="sec" id="sec-N"> per heading, in the order the reader asks.
+         Inside .sec-body use the vocabulary: p, ul/ol, .callout, .table-wrap>table.data,
+         .flow, .grid-2/.grid-3>.card, .bars, .kv, figure.diagram, pre>code.
+         Use nothing else. -->
+    <section class="sec" id="sec-1">
+      <h2>{{HEADING}}</h2>
+      <div class="sec-body">
+        <p>{{prose}}</p>
+      </div>
+    </section>
+  </article>
+
+  <footer class="colophon">
+    <!-- SLOT: what this is, what was generated, and the date. -->
+    {{COLOPHON}}
+  </footer>
+
+</main>
+</body>
+</html>

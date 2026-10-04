@@ -109,7 +109,8 @@ easy-output/
     ├── conciseness.md          # cutting: verdict first, length budgets, techniques, anti-patterns
     ├── writing.md              # ASD-STE100 rules, the 80% dial, before/after pairs
     ├── diagrams.md             # relation → diagram type; ASCII, Mermaid, SVG
-    ├── html-report.md          # single-file report contract, print stylesheet, interaction
+    ├── html-report.md          # rung 3: how to fill the template, class vocabulary
+    ├── report-template.html    # the fixed design system the agent fills in
     ├── prompt-templates.md     # prompts per document type, cut pass first
     ├── checklist.md            # the reviewer's first pass, per rung
     └── spirit.md               # source post, principles, and what this repo takes from it
@@ -125,6 +126,9 @@ easy-output/
 - Rollback before work. A plan with no per-phase verification cannot be executed by anyone else.
 - Label assumptions, source numbers, fence the scope.
 - Walk the reviewer's first pass on your own draft, and open the report before delivering it.
+- Close every Markdown delivery with one question: would you like this as an HTML report? Build it
+  only on a yes.
+- Add no CSS to the report template, and ship no artifact with `{{` markers still in it.
 - Ask before a render that takes more than a few minutes, and read credentials from the environment.
 
 ## Provenance

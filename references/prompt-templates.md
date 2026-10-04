@@ -97,18 +97,19 @@ Templates 0–2 carry the most value and cost nothing.
 
 ## 9. Single-file HTML report
 
-> Render this document as a single self-contained HTML report.
+> Turn this document into an HTML report using the report template bundled with this skill
+> (`references/report-template.html`). Copy that file, keep its `<style>` block byte for byte, and
+> replace every `{{TOKEN}}` and `<!-- SLOT -->` marker. Delete every comment that remains.
 >
-> - One file, inline CSS and JS, no framework, no build step, opens from `file://` and works offline.
-> - Verdict block at the top with the same wording as the Markdown version, then a table of contents.
-> - Sections are the headings from the document; no new content.
-> - Sortable tables where there are several; `<details>` for evidence a reviewer may skip; the numbers
->   stay in the markup so the print view carries them too.
-> - Print stylesheet: nav dropped, `<details>` expanded, tables kept off page breaks.
-> - System font stack, 16–20px body, responsive to 375px, `prefers-color-scheme` and
->   `prefers-reduced-motion` respected, keyboard accessible.
-> - Footer: sources, generation date, what was generated.
-> - Then open it (or screenshot it), check the console, and tell me what you saw.
+> - Verdict block at the top, same wording as the Markdown version, 150 words or less.
+> - Table of contents built from the section headings, in the order the reader asks.
+> - Move the existing tables and the diagram in as-is: `table.data` and `figure.diagram`. No new
+>   content, no new claims.
+> - Status column values become `ok` / `no` / `warn` badges.
+> - Class names only from the template's vocabulary. Add no CSS. The only inline style allowed sets
+>   `--v` / `--max` / `--cols`.
+> - Then open it, check the console, check 375 px and 1440 px, check the print preview, and tell me
+>   what you saw.
 >
 > Save as `[slug].html` and reply with the path, the verdict in one line, and what to read first.
 

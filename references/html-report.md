@@ -1,103 +1,102 @@
-# Rung 3 — Single-file HTML report
+# Rung 3 — HTML report
 
-Use this when the document gets re-read, circulated, reviewed by several people, compared against
-alternatives, or carries enough tables that a Markdown file stops being scannable. Everything below
-also holds for the Markdown version of the same document — the content contract lives in
-[documents.md](documents.md), and this file covers the rendering.
+The report is **filled, not designed**. Copy [`report-template.html`](report-template.html), replace
+its slots, and leave the `<style>` block untouched. Roughly 60% of the finished page is that
+stylesheet; the agent contributes the content on top of it.
 
-## The one-file contract
+That is what keeps the output looking considered. Hand-authored CSS from a model produces a page that
+opens but reads badly, because every visual decision competes with every other one. Here those
+decisions were made once, in the template, and then compiled into every report.
 
-- **One `.html` file.** Inline CSS and JS. No build step, no framework, no npm.
-- **Opens from `file://`** and works offline, so a reviewer can open an attachment.
-- **No CDN dependency for the content to be readable.** Reach for zero libraries: hand-written SVG,
-  `<canvas>`, and the platform DOM cover a report.
-- **No secrets, no private paths, no local absolute file references.**
-- **Portable name:** `<topic-slug>.html`.
+## When rung 3 is right
 
-## Report structure
+The document will be re-read, circulated, reviewed by several people, or compared against another
+version, or it carries enough tables that Markdown stops being scannable.
 
-```html
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>The verdict, not the topic</title>
-  <style>/* inline */</style>
-</head>
-<body>
-  <header>
-    <h1>The verdict</h1>
-    <p class="status">Project analysis · 2026-10-03 · for review · locks: the queue choice</p>
-    <section class="verdict"><!-- ≤150 words: recommendation, cost, risk, the ask --></section>
-  </header>
-  <nav><!-- table of contents; reports get skimmed, then re-read --></nav>
-  <main>
-    <section id="state"><h2>What is the state today</h2>…</section>
-    <section id="problem"><h2>What it costs us</h2>…</section>
-    <section id="options"><h2>What the options are</h2>…table…</section>
-    <section id="recommendation"><h2>What we recommend</h2>…</section>
-    <section id="risks"><h2>What could go wrong</h2>…</section>
-    <section id="scope"><h2>What is out of scope</h2>…</section>
-  </main>
-  <footer>Sources, generation date, and the one line saying what was generated.</footer>
-  <script>/* inline, no build step */</script>
-</body>
-</html>
-```
+**Ask before building.** The ask is required; the artifact is not. Deliver the Markdown first, then ask
+once.
 
-The headings are the questions the reader has, taken straight from the shape in
-[documents.md](documents.md). The verdict block is the same ≤150 words as the Markdown version.
+## The fill-in contract
 
-## When interactivity earns its place
+1. Copy `report-template.html` to `./<slug>.html`.
+2. Replace every `{{TOKEN}}` and every `<!-- SLOT -->` marker.
+3. Delete every comment that remains. Nothing starting with `<!--` may survive.
+4. Add no CSS. No new `<style>`. The only `style=` allowed sets a custom property: `--v`, `--max`, or
+   `--cols`.
+5. Use only the classes in the vocabulary below.
+6. Open it, and run the rung 3 gate in [checklist.md](checklist.md).
 
-| Content | Control |
+## Slots
+
+| Marker | What goes in |
 |---|---|
-| A long table of candidates | Sort and filter columns |
-| Detail a reviewer may skip | `<details>` for the per-criterion evidence |
-| Alternative scenarios | Tabs, so the reader compares rather than scrolls |
-| A weighting or threshold | Slider over the weights, with the ranking updating live |
-| A chart | Hover to read the exact value; label the axes |
-| A prompt or a query to reuse | Copy button with the text selectable |
+| `{{LANG}}` | `zh-CN` or `en`, matching the document's language |
+| `{{TITLE}}` | the claim, used in both `<title>` and `<h1>` |
+| `{{DOC_TYPE}}` | Project analysis / Evaluation / Execution plan / Spec / ADR / Runbook |
+| `{{SUBTITLE}}` | one line of context. Delete the element when there is nothing to say |
+| `.meta` rows | status, date, what the document locks, where the numbers came from. Delete unused rows |
+| `{{VERDICT_HEADING}}` | the verdict's label, for example "Recommendation" |
+| `{{VERDICT}}` | ≤150 words: recommendation, cost, main risk, what is asked of the reader |
+| TOC `<li>` | one per section, in the order the reader asks |
+| sections | one `<section class="sec" id="sec-N">` per heading, with the `id` matching the TOC link |
+| `{{COLOPHON}}` | what this is, what was generated, the date |
 
-Two rules: **the default view stands on its own** (a reader who touches nothing still gets the
-document), and **every control has a keyboard-reachable equivalent** (a real `<button>`,
-`<input type="range">`, `<details>`).
+## Class vocabulary
 
-## Design defaults
+| Class | Renders | Use it for |
+|---|---|---|
+| `.kicker` | a 12px mono uppercase label | the document type |
+| `.meta` with `dt`/`dd` | a two-line status strip | date, status, locks, source |
+| `.verdict`, `.verdict-title`, `.verdict-body` | the framed box at the top | the ≤150-word verdict |
+| `.toc` | a horizontal link list | the section list |
+| `.sec`, `.sec-body` | one card per section | a heading's content |
+| `table.data` inside `.table-wrap` | a bordered, scrollable table | options, comparisons, scorecards |
+| `.st` with `--ok` / `--no` / `--warn` | a ✓ / ✗ / ! badge | status columns |
+| `.callout` with `--ok` / `--warn` / `--err` | a tinted box with a title | a conclusion, a warning, a risk |
+| `.flow`, `.flow-step` | a numbered vertical rail | a linear process or sequence |
+| `.grid-2` / `.grid-3` with `.card` | responsive card grids | parallel options, at-a-glance facts |
+| `.bars`, `.bar`, `.bar-track`, `.bar-fill` | labelled bars against a maximum | limits, budgets, scores |
+| `.kv` with `dt`/`dd` | a term and definition grid | a short metadata block inside a section |
+| `figure.diagram` | an inline-SVG wrapper | a real diagram, when a table or a flow will not do |
+| `pre > code` | a code block | commands, configuration |
+| `.colophon` | the muted footer | provenance |
 
-- **Typography first.** System font stack, 16–20 px body, 1.5–1.7 line-height, 60–75 character
-  measure.
-- **Dark and light** through `@media (prefers-color-scheme: dark)` with custom properties on `:root`.
-- **Respect motion.** Wrap animation in `@media (prefers-reduced-motion: no-preference)`.
-- **Responsive by construction.** Fluid widths, `max-width` on the content column, readable at 375 px.
-- **Print stylesheet.** Reports get printed and PDF'd: a `@media print` block that drops the nav,
-  expands `<details>`, and keeps tables off page breaks.
-- **Restrained palette.** One accent colour; colour only where it carries meaning.
-- **Visible focus** on every control.
+## Rules for the content you insert
 
-## Data integrity
+- **Same facts as the Markdown version.** The report adds navigation and legibility, and no claims.
+- **Copy the verdict word for word.** A report that disagrees with the document it renders is worse
+  than no report.
+- **Status columns become badges.** A cell reading `ok approved` becomes
+  `<span class="st st--ok">approved</span>`.
+- **A bar needs a maximum.** `style="--v:13;--max:20"` on the `.bar`. A bar without `--max` is a lie
+  with a gradient, and an axis that starts anywhere but zero is the same lie.
+- **`figure.diagram` is the last resort.** Coordinates on a 20px grid, stroke and fill only from the
+  template's variables, a `<title>` for screen readers, and a `<figcaption>` stating the takeaway.
+- **No controls.** No sorting, filtering, or toggles: a report is read, not operated. Content that
+  genuinely must be operated belongs in an interactive page, which is a different rung.
+- **Delete the slots you do not need**, and nothing else.
 
-- Real numbers with units and sources. Illustrative values labelled in the page.
-- Charts: labelled axes, units, a title stating the takeaway, honest ranges.
-- A table that hides its evidence behind a click also hides it from a reviewer reading a PDF — keep
-  the numbers in the markup, and let the interaction sort or expand rather than reveal.
+## What the template already handles
+
+- Light and dark through `prefers-color-scheme`, with every colour behind a custom property, so your
+  content never names a colour.
+- The type scale, the measure limits, and the one rhythm rule that keeps sibling spacing even.
+- A print stylesheet: the TOC is dropped, and sections avoid page breaks.
+- Responsive behaviour at 760 px, including the card grids and the bars.
+- `prefers-reduced-motion` and a visible focus ring.
+- Semantic structure: `main`, `header`, `nav`, `article`, `section`, `footer`, `dl`, `table`,
+  `figure`. Keep them.
 
 ## Verification
 
-Open the file and check: the console is clean, no failed requests, layout at 375 px and 1440 px,
-keyboard tab order, dark mode, reduced motion, and the print preview. Then confirm it opens from disk
-over `file://`. Full gate: [checklist.md](checklist.md).
-
-## Deliverable message
-
-Path, how to open it, the verdict in one line, and what the reviewer should read first. The document
-states the rest.
+Run the rung 3 gate in [checklist.md](checklist.md). Two checks catch most failures: `grep -c '{{'
+<slug>.html` returns 0, and the page opens from `file://` in a real browser.
 
 ## Anti-patterns
 
-- A report that could have been a three-paragraph memo.
-- A framework and a build step for a one-off document.
-- Interactivity that hides the conclusion behind a click.
-- A page that needs a network fetch to be readable.
-- Charts carrying unlabelled axes, or numbers with no source.
+- Authoring CSS. It is the fastest route back to an ugly page.
+- Inventing class names outside the vocabulary. They render as unstyled text.
+- Shipping with `{{` or `<!--` markers still in the file.
+- Rewriting the verdict or the numbers for the report, so the two versions disagree.
+- A bar without `--max`, or an axis that starts above zero.
+- Adding a table that does not exist in the Markdown version: a new claim nobody reviewed.

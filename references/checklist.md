@@ -45,18 +45,23 @@ The document contract, checked in order (see [documents.md](documents.md)):
 - [ ] The caption states the takeaway ("Retries double p99 latency") rather than the topic ("Retry
       diagram").
 
-## Rung 3 — HTML report
+## Rung 3 — HTML report (filling the shipped template)
 
+- [ ] Built from `report-template.html`, not from scratch. The `<style>` block is unchanged.
+- [ ] No `{{` and no `<!--` left anywhere in the file. Grep it before delivering.
+- [ ] No CSS added: no new `<style>`, and no `style=` beyond a `--v` / `--max` / `--cols` custom
+      property.
+- [ ] Class names come only from the vocabulary in [html-report.md](html-report.md).
 - [ ] Opened it in a real browser (or took a headless screenshot). Not "it should render".
-- [ ] The verdict block is present at the top and matches the Markdown wording.
-- [ ] Zero console errors, zero failed requests.
-- [ ] Works from `file://` offline, and after a hard refresh.
-- [ ] Responsive at ~375 px and ~1440 px; nothing overflows or overlaps.
-- [ ] Keyboard accessible: sane tab order, visible focus, real controls.
-- [ ] `prefers-color-scheme` and `prefers-reduced-motion` respected.
-- [ ] Print preview checked: nav dropped, `<details>` expanded, tables not split mid-row.
-- [ ] Interactivity sorts or expands; the numbers stay in the markup for the PDF reader.
-- [ ] Text is selectable, and the verdict can be copied straight out.
+- [ ] The verdict block sits at the top, matches the Markdown wording, and is ≤150 words.
+- [ ] Every TOC link resolves to a section id that exists, and every section appears in the TOC.
+- [ ] Zero console errors, zero failed requests. Works from `file://` offline.
+- [ ] Readable at 375 px and at 1440 px, with no horizontal scroll on the page body.
+- [ ] Print preview checked: TOC gone, no section split across pages, tables not clipped.
+- [ ] Dark mode checked (or the OS toggle simulated): no invisible text, no washed-out badges.
+- [ ] Keyboard: tab reaches every link or control, and focus is visible.
+- [ ] The verdict can be selected and copied out as text.
+- [ ] The report was offered only after the Markdown document was done, and built only on request.
 
 ## Stop signals
 
