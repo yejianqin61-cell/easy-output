@@ -55,7 +55,7 @@ orders the requirements into phases, and `easy-task-act` writes the briefs and l
 Every shape that writes a document asks once, before writing, whether the user wants Markdown or a
 single-file HTML report. The render is `easy-report`'s job.
 
-Research documents are out of scope. Matt Pocock's `research` skill already owns that shape.
+Research documents are out of scope. That shape is already served.
 
 ## The ladder
 
@@ -124,9 +124,8 @@ gate. `easy-diagram` owns the carrier rules.
 
 The law comes from Andrej Karpathy's post of 2 October 2026 on making LLM output easier to understand.
 It is quoted in full in [`parked/spirit.md`](parked/spirit.md). The post:
-<https://x.com/karpathy/status/2105819303471976479>. The shapes build on
-[`to-spec`](https://github.com/mattpocock/skills), and `easy-audit` adapts `code-review`, both by Matt
-Pocock (MIT). Neither author has reviewed or endorsed this repository.
+<https://x.com/karpathy/status/2105819303471976479>. Karpathy has not reviewed or endorsed this
+repository.
 
 ## License
 
