@@ -49,7 +49,7 @@ npx skills use yejianqin61-cell/easy-output --skill easy-audit --agent claude-co
 
 每个会产出文档的形态，都在开写前问一次：要 Markdown 还是单文件 HTML 报告。渲染交给 `easy-report`。
 
-调研文档不在本仓范围内，那个形态已经有别的 skill 承担。
+调研文档不在本仓范围内，那个形态已经由 Matt Pocock 的 `research` skill 承担。
 
 ## 阶梯
 
@@ -113,7 +113,8 @@ skill 不带：它们渲染的文档本来就已经守了法条。`easy-report` 
 
 法条来自 Andrej Karpathy 2026 年 10 月 2 日关于 LLM 输出的帖子：
 <https://x.com/karpathy/status/2105819303471976479>，全文见 [`parked/spirit.md`](parked/spirit.md)。
-Karpathy 未审阅或背书本仓库。
+文档形态建立在 Matt Pocock 的 [`to-spec`](https://github.com/mattpocock/skills) 之上，`easy-audit` 改写自
+他的 `code-review`（MIT）。两位作者均未审阅或背书本仓库。
 
 ## 许可证
 
