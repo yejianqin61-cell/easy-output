@@ -1,0 +1,3 @@
+interface:
+  display_name: Easy Summary
+  short_description: Brief the reader on what changed, and what it means.

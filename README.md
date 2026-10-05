@@ -1,14 +1,14 @@
 # easy-output
 
-Makes an agent's engineering documents readable in minutes and dense enough to build from: project
-analysis, evaluation, execution plans, specs, ADRs, runbooks. Verdict first, headings that answer the
-reader's questions, an explicit scope fence, and ASD-STE100-grade clarity at ~80% strength.
+Agent skills that make the documents an agent writes readable in minutes, and dense enough to build
+from. One law, five document shapes, two renderers.
 
-Built on Andrej Karpathy's advice about LLM output, applied to the documents a person has to approve.
-Sits as a readability layer over Matt Pocock's [`to-spec`](https://github.com/mattpocock/skills).
+The law compresses [Karpathy's point](https://x.com/karpathy/status/2105819303471976479): we will spend
+more time reading what a model produced than writing prompts for it. A document earns that time when it
+is short enough to finish, and clear enough to act on. Twelve clauses, each with a threshold you can
+count: [`RULES.md`](RULES.md).
 
-Follows the [Agent Skills](https://agentskills.io/) format. Markdown only; no scripts, no
-dependencies.
+Follows the [Agent Skills](https://agentskills.io/) format. Markdown only, with no runtime dependencies.
 
 [中文说明 →](README.zh-CN.md)
 
@@ -18,130 +18,115 @@ dependencies.
 npx skills add yejianqin61-cell/easy-output -g
 ```
 
-That is [Vercel Labs' `skills` CLI](https://github.com/vercel-labs/skills). It resolves the repo,
-reads `SKILL.md` from the root, and installs to every agent it detects — Claude Code, Codex, Cursor,
-OpenCode and ~75 others.
+That is [Vercel Labs' `skills` CLI](https://github.com/vercel-labs/skills). It finds every `SKILL.md`
+under `skills/`. Then it installs into every agent it detects: Claude Code, Codex, Cursor, OpenCode and
+about 75 more.
 
 ```bash
-npx skills add yejianqin61-cell/easy-output -g -a claude-code -y    # target agents, non-interactive
-npx skills add yejianqin61-cell/easy-output --list                  # preview the repo
-npx skills use yejianqin61-cell/easy-output --skill easy-output --agent claude-code
-npx skills update easy-output
-npx skills remove easy-output
+npx skills add yejianqin61-cell/easy-output --list                 # preview first
+npx skills add yejianqin61-cell/easy-output -g -a claude-code -y   # one agent
+npx skills use yejianqin61-cell/easy-output --skill easy-audit --agent claude-code
 ```
 
-`-g` installs for every project; drop it for `./.claude/skills/`. Installation runs through symlinks,
-so a `git pull` in the clone updates the skill; add `--copy` where symlinks are awkward.
+`-g` installs for every project. Drop it to install into `./.claude/skills/` instead. Installs run
+through symlinks, so a `git pull` keeps them current; add `--copy` where symlinks are awkward.
 
-Manual install:
+To install by hand, clone the repo and symlink `skills/<bucket>/<name>` into your agent's skills
+directory.
 
-```bash
-git clone https://github.com/yejianqin61-cell/easy-output.git ~/.claude/skills/easy-output   # global
-git clone https://github.com/yejianqin61-cell/easy-output.git .claude/skills/easy-output     # project
-```
+## The skills
 
-## What it produces
-
-| Document | Reader | The question it answers |
-|---|---|---|
-| **Project analysis** 项目分析 | whoever commits effort or budget | what is the state, what it costs, what we recommend |
-| **Evaluation** 评估 | the decision-maker | which option wins, on what criteria, what would reverse it |
-| **Execution plan** 施工计划 | the executor and the approver | what happens, in what order, how we know it is done |
-| **Spec** 规格 | the implementing agent, plus the reviewer | what problem, what solution, which decisions are locked |
-| **ADR** 决策记录 | a future maintainer | why it is like this |
-| **Runbook** 操作手册 | someone under time pressure | how to run it, undo it, and tell that it broke |
-
-Skeletons, section lists, and length budgets for all six are in
-[`references/documents.md`](references/documents.md).
-
-## The document contract
-
-Eight rules, applied to every type. The first one is what makes a document approvable:
-
-1. **Decision-first.** The verdict — recommendation, cost, main risk, the ask — lands in the first
-   ≤150 words. A reviewer who stops there still knows where the document stands.
-2. Headings are the reader's questions, in the order the reader asks them.
-3. One screen, one idea.
-4. An out-of-scope section naming what was deliberately declined.
-5. Assumptions labelled as assumptions; open questions listed with a way to resolve each.
-6. Numbers carry units, sources, and a date.
-7. A status line: type, date, status, the decisions this document locks.
-8. A dense body with a navigable surface — the summary and headings are the human interface.
-
-## How it works
-
-Four steps, in order. The first three are free.
-
-| Step | What it does |
+| Skill | What it does |
 |---|---|
-| **Cut** | Drops preamble, restated questions, recaps, hedges. Prefers a table to a paragraph for parallel items. |
-| **Clarify** | One idea per sentence, active voice, one word for one meaning, no nominalizations. ASD-STE100 at ~80%: its writing rules, ordinary vocabulary, one clearly marked analogy. |
-| **Shape** | Picks the document type, writes the verdict, orders headings as the reader's questions, fences the scope. |
-| **Render** | Tables and one or two diagrams where they replace paragraphs; a single-file HTML report when the document gets re-read or circulated. |
+| [easy-audit](skills/documents/easy-audit/SKILL.md) | Requirements with percentages, defects, one plan each |
+| [easy-summary](skills/documents/easy-summary/SKILL.md) | What changed, what it means, what is still open |
+| [easy-plan](skills/documents/easy-plan/SKILL.md) | Requirements into phases, each ending somewhere demoable |
+| [easy-task-act](skills/documents/easy-task-act/SKILL.md) | One brief per task, then each task in its own commit |
+| [easy-registry](skills/documents/easy-registry/SKILL.md) | One row per item, kept current across many edits |
+| [easy-diagram](skills/render/easy-diagram/SKILL.md) | One claim, one figure: ASCII, Mermaid or SVG |
+| [easy-report](skills/render/easy-report/SKILL.md) | The document as a single-file HTML page |
 
-The rungs run 0–3: a few sentences, a cut document, a document plus structure, a document plus an
-HTML report. Rung 1 carries the value. Stop at the rung where the human can approve the document.
+Each `SKILL.md` carries the full contract, so this table stays a directory.
 
-## Usage
+The chain runs audit, plan, task and act. `easy-audit` names the defects and their plans, `easy-plan`
+orders the requirements into phases, and `easy-task-act` writes the briefs and lands them.
+`easy-summary` closes the round. `easy-registry` holds what nobody is working on yet.
 
-The skill triggers on its own when you ask for a document or flag that one is unreadable. It also
-fires before the agent sends a draft that has run long.
+Every shape that writes a document asks once, before writing, whether the user wants Markdown or a
+single-file HTML report. The render is `easy-report`'s job.
 
+Research documents are out of scope. Matt Pocock's `research` skill already owns that shape.
+
+## The ladder
+
+Karpathy's post climbs four rungs, each introduced by the same two words: "But even better". The medium
+is a variable, and the cheapest one that opens the channel the content needs wins.
+
+| Rung | In this repository |
+|---|---|
+| 1. Constrained, cut prose | The law: [`RULES.md`](RULES.md), carried by every shape skill. |
+| 2. A diagram | [easy-diagram](skills/render/easy-diagram/SKILL.md), inside a document or as the artifact. |
+| 3. A web page | [easy-report](skills/render/easy-report/SKILL.md), a fixed template the document renders into. |
+| 4. An explainer video | Out of scope: this reader approves documents rather than watching explanations. |
+
+The source post is most bullish on the rung 4 explainer video, and this repository does not carry that
+rung. Text stays the right medium where the reader must quote, grep, or check precision.
+
+## Language
+
+Skills are written in English. Every skill and every root document has a Chinese companion beside it,
+named `<name>.zh-CN.md`. Two examples: [`RULES.zh-CN.md`](RULES.zh-CN.md) and
+[`SKILL.zh-CN.md`](skills/documents/easy-audit/SKILL.zh-CN.md). The companions are for readers, and they
+change nothing at run time.
+
+The documents these skills produce are written in the language you are using. A skill names its fixed
+words in English, and tells the agent to translate them once and stay consistent.
+
+## Checking this repository
+
+```bash
+python tools/check.py            # every gate
+python tools/check.py prose      # one gate
+python tools/check.py --report   # the metric table
 ```
-Write up an analysis of our auth layer and what we should do.   → project analysis, verdict first
-Evaluate these three queue services for our workload.           → criteria and weights before scores
-Write the migration plan for moving off RabbitMQ.               → phases, per-phase verification, rollback
-Turn what we just decided into a spec.                          → spec plus a decision summary
-Why did we pick Postgres? Write it down.                        → ADR, one decision
-This doc is 4 pages and I still don't get it.                   → cut a third, verdict at the top
-Explain how TCP slow start works.                               → the secondary case: verdict + diagram
-```
 
-Prompts for each document type are in [`references/prompt-templates.md`](references/prompt-templates.md).
+Four gates hold the promises this repository makes. The law is in six places, and they must match. Every
+relative link must resolve. Every document must obey the countable clauses. Every skill must be
+installable. See [`tools/README.md`](tools/README.md).
 
 ## Structure
 
 ```
 easy-output/
-├── SKILL.md                    # rungs, 10 operating rules, 5 selection questions, routing table
-└── references/
-    ├── documents.md            # the document contract and the six shapes
-    ├── conciseness.md          # cutting: verdict first, length budgets, techniques, anti-patterns
-    ├── writing.md              # ASD-STE100 rules, the 80% dial, before/after pairs
-    ├── diagrams.md             # relation → diagram type; ASCII, Mermaid, SVG
-    ├── html-report.md          # rung 3: how to fill the template, class vocabulary
-    ├── report-template.html    # the fixed design system the agent fills in
-    ├── prompt-templates.md     # prompts per document type, cut pass first
-    ├── checklist.md            # the reviewer's first pass, per rung
-    └── spirit.md               # source post, principles, and what this repo takes from it
+├── RULES.md                      # the readability law: twelve clauses and their thresholds
+├── RULES.zh-CN.md                # the same law, in Chinese
+├── CLAUDE.md                     # how skills are written here
+├── tools/                        # the check command, with its metrics library
+├── parked/                       # retired material, kept out of the install
+└── skills/
+    ├── documents/                # one skill per document shape
+    │   ├── easy-audit/           SKILL.md + SKILL.zh-CN.md + agents/ + references/
+    │   ├── easy-summary/         SKILL.md + SKILL.zh-CN.md + agents/ + references/
+    │   ├── easy-plan/            SKILL.md + SKILL.zh-CN.md + agents/ + references/
+    │   ├── easy-task-act/        SKILL.md + SKILL.zh-CN.md + agents/ + references/
+    │   └── easy-registry/        SKILL.md + SKILL.zh-CN.md + agents/ + references/
+    └── render/                   # a document turned into another medium
+        ├── easy-diagram/         SKILL.md + SKILL.zh-CN.md + agents/ + references/
+        └── easy-report/          SKILL.md + SKILL.zh-CN.md + agents/ + references/
 ```
 
-`SKILL.md` holds the routing and pulls in a `references/` file only when the rung calls for it.
-
-## Operating rules
-
-- Verdict first. A document whose conclusion sits on the last page gets sent back.
-- Cut before decorating. A 900-word draft that 150 words could carry has a text problem.
-- Criteria before scores. An evaluation with no reversal condition is advocacy.
-- Rollback before work. A plan with no per-phase verification cannot be executed by anyone else.
-- Label assumptions, source numbers, fence the scope.
-- Walk the reviewer's first pass on your own draft, and open the report before delivering it.
-- Close every Markdown delivery with one question: would you like this as an HTML report? Build it
-  only on a yes.
-- Add no CSS to the report template, and ship no artifact with `{{` markers still in it.
-- Ask before a render that takes more than a few minutes, and read credentials from the environment.
+Each of the five document skills carries a copy of the law at `references/readability-law.md`, because
+skills install separately. The two render skills carry none: they render a document that already obeys
+the law. `easy-report` owns `references/report-template.html`, the fill-in contract, and the render
+gate. `easy-diagram` owns the carrier rules.
 
 ## Provenance
 
-Two sources. The writing standard comes from Andrej Karpathy's post of 2 October 2026 on making LLM
-output easier to understand: <https://x.com/karpathy/status/2105819303471976479>, quoted in full in
-[`references/spirit.md`](references/spirit.md). The document shapes build on
-[`to-spec`](https://github.com/mattpocock/skills) by Matt Pocock (MIT), which turns a conversation into
-a spec for the agent that will implement it; this repository adds the layer that makes the same
-document auditable by a human. Neither author has reviewed or endorsed this repository.
-
-ASD-STE100 is published by the ASD at <https://www.asd-ste100.org/>.
-[`references/writing.md`](references/writing.md) paraphrases its well-known rules for practical use.
+The law comes from Andrej Karpathy's post of 2 October 2026 on making LLM output easier to understand.
+It is quoted in full in [`parked/spirit.md`](parked/spirit.md). The post:
+<https://x.com/karpathy/status/2105819303471976479>. The shapes build on
+[`to-spec`](https://github.com/mattpocock/skills), and `easy-audit` adapts `code-review`, both by Matt
+Pocock (MIT). Neither author has reviewed or endorsed this repository.
 
 ## License
 
@@ -149,7 +134,6 @@ ASD-STE100 is published by the ASD at <https://www.asd-ste100.org/>.
 
 ## Contributing
 
-Issues and PRs welcome; keep them small. Contributions that land well: a sharper before/after STE
-pair, a document shape that earns its sections, a verification step that caught a real failure, a
-corrected fact or licence detail. Keep it dependency-free, keep `SKILL.md` thin, and keep this README
-short — it is the first thing a reader sees.
+Small contributions land best. A sharper before/after pair in the law. A document shape that earns its
+sections. A check that caught a real failure. A corrected fact or licence detail. Keep it
+dependency-free, keep each `SKILL.md` thin, and keep this README short.

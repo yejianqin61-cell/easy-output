@@ -1,7 +1,23 @@
-# Verification checklist — before you deliver
+﻿# Verification checklist — before you deliver
 
 An artifact you have not opened is a guess. This is the gate a reviewer will run; run it yourself
 first.
+
+## The ten laws — counted
+
+Take the counts from [RULES.md](../RULES.md). One miss sends the draft back for the edit pass.
+
+- [ ] The verdict appears within the first 15% of the document.
+- [ ] Zero strikethroughs, round numbers, or superseded verdicts in the body; the change log sits at
+      the end, one line per change.
+- [ ] Zero facts, statuses or verdicts stated in two places.
+- [ ] Longest table cell ≤120 characters, and under 10% of cells over 40.
+- [ ] ≤1 bold span per line, and ≤40% of lines carrying bold. No bold inside a cell.
+- [ ] Zero lines over 200 characters.
+- [ ] Zero fields whose whole content is a reference.
+- [ ] Zero references the reader must follow to finish the sentence.
+- [ ] Zero synonyms for a declared status word.
+- [ ] Every judgement traces to a criterion stated in the document.
 
 ## Every document
 
@@ -51,7 +67,7 @@ The document contract, checked in order (see [documents.md](documents.md)):
 - [ ] No `{{` and no `<!--` left anywhere in the file. Grep it before delivering.
 - [ ] No CSS added: no new `<style>`, and no `style=` beyond a `--v` / `--max` / `--cols` custom
       property.
-- [ ] Class names come only from the vocabulary in [html-report.md](html-report.md).
+- [ ] Class names come only from the vocabulary in [html-report.md](../skills/render/easy-report/references/fill-in-contract.md).
 - [ ] Opened it in a real browser (or took a headless screenshot). Not "it should render".
 - [ ] The verdict block sits at the top, matches the Markdown wording, and is ≤150 words.
 - [ ] Every TOC link resolves to a section id that exists, and every section appears in the TOC.

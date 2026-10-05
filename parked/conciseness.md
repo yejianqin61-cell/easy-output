@@ -80,6 +80,5 @@ runbook — live in [documents.md](documents.md).
 
 Conciseness is not an argument for a bigger artifact — it is an argument for a **smaller** one.
 The correct response to "this is hard to read" is usually: cut a third of it, and possibly replace
-two paragraphs with one diagram or one table. That is rung 1 and rung 2. Climbing to rung 3 or 4 to
-solve a readability problem that deletion would solve is over-building; see the uplevel rule in
-[SKILL.md](../SKILL.md).
+two paragraphs with one diagram or one table. That is rung 1 and rung 2. Climbing to rung 3 to solve a
+readability problem that deletion would solve is over-building.

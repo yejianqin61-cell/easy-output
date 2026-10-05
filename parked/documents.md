@@ -11,24 +11,21 @@ assumptions.
 
 ## The document contract
 
-Eight rules, applied to every type below.
+The ten laws in [RULES.md](../RULES.md) hold for every type below: the verdict in the first screen, the
+present state with no edit trail in the body, one verdict in one place, cells that hold facts, scarce
+emphasis, one idea per line, references that supplement statements, no cross-section assembly, one
+word for one meaning, no claim without a criterion. On top of them, five shape-level rules:
 
-1. **Decision-first.** Open with the verdict: the recommendation, its cost, its main risk, and what
-   is being asked of the reader — in ≤150 words or a small table. A reviewer who stops there still
-   knows where the document stands. Everything after it is support.
-2. **Headings are the reader's questions**, in the order the reader asks them. Where the reader has
+1. **Headings are the reader's questions**, in the order the reader asks them. Where the reader has
    no such question, the section stays out.
-3. **One screen, one idea.** A section that needs scrolling gets subheadings, or becomes two sections.
-4. **Scope fence.** A named out-of-scope section listing what was deliberately declined. Reviewers
+2. **Scope fence.** A named out-of-scope section listing what was deliberately declined. Reviewers
    read it first, and it is the cheapest place to catch a wrong decision.
-5. **Unknowns get their own line.** Assumptions are labelled assumptions; open questions are listed
+3. **Unknowns get their own line.** Assumptions are labelled assumptions; open questions are listed
    with the way to resolve each. A guess in the indicative mood is the most expensive defect in the
    document.
-6. **Numbers carry units, sources, and a date.** Real values only. Where a figure is illustrative,
-   say so in the same line.
-7. **Status line at the top.** Document type, date, status (draft / for review / approved), and the
+4. **Status line at the top.** Document type, date, status (draft / for review / approved), and the
    decisions this document locks.
-8. **Dense body, navigable surface.** Keep the body as dense as the implementing agent needs. The
+5. **Dense body, navigable surface.** Keep the body as dense as the implementing agent needs. The
    summary and the descriptive headings are the human interface to it.
 
 ## The six shapes

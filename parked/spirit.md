@@ -1,4 +1,4 @@
-# The spirit — what this skill is compressing
+﻿# The spirit — what this skill is compressing
 
 Source: Andrej Karpathy's post of **2 October 2026** on making LLM output easier to understand —
 a single post, not a thread: <https://x.com/karpathy/status/2105819303471976479>. It is quoted
@@ -90,7 +90,7 @@ and spend a slice of your effort on the version that seems too ambitious.
 abundant, a large, custom, single-use artifact becomes rational: a bespoke web app or explainer
 video for one question, built in an hour and thrown away. These would never have justified
 themselves before. The win is not the artifact — it is the understanding you keep and the artifact
-you drop. See the discardable rule in [SKILL.md](../SKILL.md).
+you drop.
 
 **9. Do not let credentials be the gate.** A missing key or an absent tool changes the route; ask
 for a capable alternative and carry on.
@@ -109,7 +109,7 @@ artifacts a person has to approve and work from, and because that is where the f
 |---|---|
 | 1. Constrained, cut prose | Implemented, and it carries the value. See [writing.md](writing.md), [conciseness.md](conciseness.md). |
 | 2. Diagrams | Implemented, as compression inside a document. See [diagrams.md](diagrams.md). |
-| 3. Web pages | Implemented, as the single-file HTML report a document renders into. See [html-report.md](html-report.md). |
+| 3. Web pages | Implemented, as the single-file HTML report a document renders into. See [html-report.md](../skills/render/easy-report/references/fill-in-contract.md). |
 | 4. Explainer videos | Out of scope by choice. The source post's argument for it stands, and this repository does not carry the rung. |
 
 Two further departures, both deliberate:
