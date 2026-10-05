@@ -13,8 +13,12 @@ description: >-
 finished.
 
 This skill has two halves, and the order between them is the point: **write every brief in the batch
-first, then implement.** The batch is a gate. An agent that starts coding after the first brief has
-stopped planning and started hoping.
+first, then implement.** The batch is one phase: every task in it, and nothing from the next one. That
+is three to seven briefs, because `easy-plan` caps a phase there. The batch is a gate. An agent that
+starts coding after the first brief has stopped planning and started hoping.
+
+A phase holding more than seven tasks is two phases. Do not write twenty-five briefs: cut the phases
+again, or take one phase and leave the rest of the plan for the next batch.
 
 Read [references/readability-law.md](references/readability-law.md) before writing. Its twelve clauses
 hold here.
@@ -26,7 +30,8 @@ the answer. For the report, finish the Markdown first, then call the Skill tool 
 
 ## Parts 1 to 4: the brief
 
-One document per task. Four parts, and no others.
+One document per task, and one screen each. Four parts, and no others. A brief that runs past a screen
+is carrying a fact that belongs in the code, or a second task.
 
 ### 1. Where this task sits
 
@@ -45,12 +50,15 @@ stale, and a path does not.
 |---|---|---|
 | **Read first** | 3 to 5 entries, `path — the question it answers` | 3 to 5 lines |
 | **Settled** | the decisions this task must not reopen, each with where it lives | ≤4 lines |
-| **Edges and seam** | what it touches, what it leaves alone, the seam it is tested at | ≤3 lines |
+| **Edges and seam** | the seam `easy-plan` named, what it touches, what it leaves alone | ≤3 lines |
 | **Run** | the exact test command and typecheck command for this task | ≤3 lines |
 | **Unknowns** | where it will probably snag, and the trigger to stop and ask | ≤3 lines |
 
 A path without a question is noise. These are entry points, not an inventory. Give the three to five
 places a person handing this over would name. Then let the agent expand the list by searching from them.
+
+The seam is the plan's. Restate it here, and add none: a brief that picks its own seam has reopened a
+decision the plan closed.
 
 ### 3. The workflow
 

@@ -222,10 +222,10 @@ def gate_prose():
                 "%s carries %.2f bold spans per line (max %.1f)"
                 % (name, m["bold_per_line"], BOLD_PER_LINE)
             )
-        if m["bold_other_pct"] > BOLD_LINE_PCT:
+        if m["bold_emphasis_pct"] > BOLD_LINE_PCT:
             findings.append(
-                "%s puts bold on %.1f%% of its non-list lines (max %d%%)"
-                % (name, m["bold_other_pct"], BOLD_LINE_PCT)
+                "%s puts emphasis on %.1f%% of lines (max %d%%)"
+                % (name, m["bold_emphasis_pct"], BOLD_LINE_PCT)
             )
     summary = "%d documents pass every countable clause" % len(markdown_files())
     return ("ok" if not findings else "fail"), findings, summary
@@ -303,7 +303,7 @@ def discover():
     missing = expected - found
     if missing:
         return "installer missed %s" % ", ".join(sorted(missing))
-    extra = found - expected
+    extra = {n for n in found - expected if n not in str(ROOT)}
     tail = " (also prints %s)" % ", ".join(sorted(extra)) if extra else ""
     return "installer sees all %d skills%s" % (len(expected), tail)
 
@@ -318,7 +318,8 @@ REPORT_KEYS = [
     ("cells_over_40", "cells >40"),
     ("bold", "bold"),
     ("bold_per_line", "bold/line"),
-    ("bold_other_pct", "bold non-list %"),
+    ("bold_line_pct", "bold lines %"),
+    ("bold_emphasis_pct", "emphasis %"),
     ("lines_over_200", "lines >200"),
     ("longest_sent", "longest sent"),
     ("sent_over_25w", "sent >25w"),

@@ -44,6 +44,12 @@ NOM_ZH = re.compile(r"(?:进行|开展|作出)(?![中时着完了])(?=[\u4e00-\u
 CODE = re.compile(r"(?:[A-Z]{1,4}-\d+|Phase \d+|rung \d+)")
 PAREN = re.compile(r"[（(][^（()）]*[)）]")
 NAMED = re.compile(r"^\s*[:—–\-←→]*\s*[\w\u4e00-\u9fff]")
+# A connective is not a name. `R-1 and R-2 is met` names neither code.
+CONNECTIVE = re.compile(
+    r"^\s*[:—–\-←→]*\s*(?:and|or|then|also|plus|is|are|was|were|be|been|"
+    r"will|would|can|could|should|must|has|have|had)\b",
+    re.I,
+)
 CELL_SPLIT = re.compile(r"(?<!\\)\|")
 
 VERDICT = re.compile(r"结论|判定|建议|决定|推荐")
@@ -141,27 +147,23 @@ def nominalisations(lines):
     return out
 
 
-def _in_code_parenthetical(s, start, end):
-    """True when the code sits in a parenthetical holding nothing but codes."""
-    for m in PAREN.finditer(s):
-        if m.start() <= start and end <= m.end():
-            inner = re.sub(r"[\s,、/]", "", CODE.sub("", m.group(0)))
-            return inner in ("()", "（）", "")
-    return False
-
-
 def bare_codes(lines):
-    """Codes that never get a name, as `[(lineno, code, line)]`."""
+    """Codes that never get a name, as `[(lineno, code, line)]`.
+
+    Table rows are exempt, because the row is the name. A parenthetical holding only
+    codes is not: `(R-1, R-2)` names neither code, and it is the exact shape a reader
+    cannot hold, two identifiers and no way to tell them apart.
+    """
     hits = []
     for n, ln in enumerate(lines, 1):
         s = ln.strip()
         if s.startswith("|"):
             continue
         for m in CODE.finditer(s):
-            if _in_code_parenthetical(s, m.start(), m.end()):
+            rest = s[m.end():]
+            if NAMED.match(rest) and not CONNECTIVE.match(rest):
                 continue
-            if not NAMED.match(s[m.end():]):
-                hits.append((n, m.group(0), s[:70]))
+            hits.append((n, m.group(0), s[:70]))
     return hits
 
 
@@ -170,22 +172,36 @@ def history_markers(text):
     return {k: len(re.findall(v, text, re.M)) for k, v in HISTORY.items()}
 
 
-def is_list_line(line):
-    return bool(LIST_START.match(line.strip()))
+LIST_PREFIX = re.compile(r"^\s*(?:[-*+]|\d+\.)\s*")
+
+
+def content_start(line):
+    """Offset of the first character the reader sees, past any list marker."""
+    m = LIST_PREFIX.match(line)
+    return m.end() if m else len(line) - len(line.lstrip())
+
+
+def is_label(line):
+    """Clause 5. One bold span, opening the line, names the field.
+
+    `**Goal**: ...` and `- **Symptom**: ...` are structure. A bold span inside the
+    running text is emphasis, and emphasis is what the clause spends.
+    """
+    spans = list(BOLD.finditer(line))
+    return len(spans) == 1 and spans[0].start() == content_start(line)
 
 
 def bold_stats(lines):
-    """Clause 5. The ratio counts non-list lines, because a list may bold each name."""
+    """Clause 5. The ratio counts emphasis, because a label is not emphasis."""
     non_empty = [ln for ln in lines if ln.strip()]
-    non_list = [ln for ln in non_empty if not is_list_line(ln)]
     spans = sum(len(BOLD.findall(ln)) for ln in non_empty)
     bold_lines = [ln for ln in non_empty if BOLD.search(ln)]
-    bold_non_list = [ln for ln in non_list if BOLD.search(ln)]
+    emphasis = [ln for ln in bold_lines if not is_label(ln)]
     return {
         "bold": spans,
         "bold_per_line": round(spans / max(len(non_empty), 1), 2),
         "bold_line_pct": round(100 * len(bold_lines) / max(len(non_empty), 1), 1),
-        "bold_other_pct": round(100 * len(bold_non_list) / max(len(non_list), 1), 1),
+        "bold_emphasis_pct": round(100 * len(emphasis) / max(len(non_empty), 1), 1),
     }
 
 
@@ -233,7 +249,7 @@ def scan(path):
         "bold": bold["bold"],
         "bold_per_line": bold["bold_per_line"],
         "bold_line_pct": bold["bold_line_pct"],
-        "bold_other_pct": bold["bold_other_pct"],
+        "bold_emphasis_pct": bold["bold_emphasis_pct"],
         "strike": len(re.findall(HISTORY["strikethrough"], text)),
         "round_markers": len(re.findall(HISTORY["round-number"], text)),
         "max_line": max((len(ln) for ln in lines), default=0),

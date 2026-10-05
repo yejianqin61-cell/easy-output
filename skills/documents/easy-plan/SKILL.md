@@ -13,7 +13,7 @@ description: >-
 the plan is the order in which those proofs come cheap.
 
 A plan is not a spec: the decisions were made there, and this file does not reopen them. A plan is not a
-A plan is not a brief either: a task here is one line, and `easy-task-act` expands it later.
+brief either: a task here is one line, and `easy-task-act` expands it later.
 
 Read [references/readability-law.md](references/readability-law.md) before writing. Its twelve clauses
 hold here.
@@ -36,21 +36,32 @@ requirement nobody wrote down still belongs here, because the plan has to carry 
 Give each one a code and a name: `R-1 Lock out after 3 failed logins`. The code is a handle; the name is
 the content. Part 1 lists them, and nothing later in the document invents a requirement.
 
-**Done when** every requirement has a code, a name, and a source.
+The `R-n` codes are this document's own, and an audit numbers its requirements `R-n` too, so the two
+lists collide. Name the source beside each requirement. Where an audit's plan is the source, cite it:
+
+`R-1 Lock out after 3 failed logins` ← `P-1 Clear the counter when the lock is released`, spec §2.1.
+
+**Done when** every requirement has a code, a name, and a source, and no code is used for two things.
 
 ### 2. Sketch the approach, one requirement at a time
 
-Four lines each, and no more:
+Five lines each, and no more:
 
 - **Approach**: the shape of the solution, in one or two sentences.
 - **Touches**: the module or the area, not the file.
 - **Test seam**: where this gets tested. Prefer a seam that exists, and prefer the highest one. The
-  ideal number of new seams is zero.
+  ideal number of new seams is zero. The seam is decided here, and `easy-task-act` restates it in the
+  brief without adding one.
+- **Acceptance**: what will be true when this requirement is met, one item per line, each one checkable.
+  A plan that follows an audit copies the audit's acceptance items here. One that starts from a spec
+  writes them now, because the next audit collects exactly this list. Without it, the next audit's part
+  1 is empty.
 - **Hard part**: what is most likely to go wrong, or what is still open.
 
 Keep it rough. Name no file, quote no code, and settle no decision that belongs to the spec.
 
-**Done when** every requirement has a seam, and no line names a file or contains code.
+**Done when** every requirement has a seam and an acceptance list, and no line names a file or contains
+code.
 
 ### 3. Cut the phases
 
@@ -64,6 +75,9 @@ phase.
 
 One line per task, verb first. The first task of a phase is the tracer bullet: a thin path through every
 layer, so the phase proves itself on its first day.
+
+When the plan follows an audit, a task is a finer cut of the audit's plan. The plan said what to build;
+a task is one step of building it. Nothing here restates a plan's acceptance items.
 
 No codes on tasks. The brief carries the whole task, and this list stays one line each.
 
@@ -97,6 +111,7 @@ Then run the edit pass in the law.
   login path checks the deadline first.
 - **Touches**: `src/auth`, and the `users` table.
 - **Test seam**: the existing `login()` entry point. No new seam.
+- **Acceptance**: [ ] three failures lock the account　[ ] the correct password fails while locked
 - **Hard part**: two failures arriving at once, and whether the count can miss one.
 
 ### R-2 Keep the counter when the lock is released
@@ -104,6 +119,7 @@ Then run the edit pass in the law.
 - **Approach**: releasing the lock clears the deadline, and leaves the count alone.
 - **Touches**: `src/auth`.
 - **Test seam**: the same `login()` entry point that R-1 Lock out after 3 failed logins uses.
+- **Acceptance**: [ ] the count survives a release　[ ] one later failure locks again
 - **Hard part**: the write order against the counter from R-1 Lock out after 3 failed logins.
 
 ### R-3 Let an admin unlock a user
@@ -111,11 +127,15 @@ Then run the edit pass in the law.
 - **Approach**: the admin action calls the same release path, and writes an audit line.
 - **Touches**: `src/admin`, `src/auth`.
 - **Test seam**: a new seam at the admin entry point. One new seam, and the lowest one that works.
+- **Acceptance**: [ ] an admin unlocks a user　[ ] the unlock writes an audit line
 - **Hard part**: which layer owns the permission check.
 
 ## 3. Phases
 
-### Phase 1 — A lock that actually locks (R-1, R-2)
+### Phase 1 — A lock that actually locks
+
+**Covers**: R-1 Lock out after 3 failed logins, for 5 minutes, and R-2 Keep the counter when the lock
+is released.
 
 **Goal**: after three failures a user sees the lock message, and the correct password stops working
 until the lock lifts.
@@ -128,10 +148,13 @@ until the lock lifts.
 - Release the lock by clearing the deadline, and keep the count
 - Cover it end to end: three failures, lock, release, one more failure locks again
 
-**Proof**: that test passes, and every acceptance item of R-1 and R-2 is met.
+**Proof**: that test passes. Every acceptance item of R-1 Lock out after 3 failed logins, and of
+R-2 Keep the counter when the lock is released, is met.
 **Not here**: the admin path, and everything about concurrency.
 
-### Phase 2 — An admin can unlock (R-3)
+### Phase 2 — An admin can unlock
+
+**Covers**: R-3 Let an admin unlock a user.
 
 **Goal**: an admin unlocks a user from the back office, and the action leaves a trace.
 

@@ -31,8 +31,18 @@ one part allowed to differ, because a copy sits inside a skill, and a link out o
 copies are the five under `skills/documents/`.
 
 `prose` holds the countable clauses. Cells ≤120 characters. Lines ≤200. No strikethrough, no round
-marker. Sentences ≤25 words. No nominalisation and no bare code. Bold under one span per line, and under
-40% of non-list lines. `parked/` is exempt, being retired material.
+marker. Sentences ≤25 words. No nominalisation and no bare code. Bold under one span per line, and
+emphasis on under 40% of lines. `parked/` is exempt, being retired material.
+
+Two of those need a word of explanation.
+
+A bold span that opens a line is a label, not emphasis, so `**Goal**: ...` and `- **Symptom**: ...`
+cost nothing. Emphasis is a bold span inside the running text, and that is what the 40% covers. The
+earlier wording counted line shape, and so failed one document in English and passed it in Chinese.
+
+A code counts as bare when no name follows it on the line. A parenthetical holding only codes is not a
+name. Write `(R-1 Lock out after 3 failed logins, R-2 Keep the counter)`, never two codes in brackets. A
+table row is exempt, because the row is the name.
 
 Clauses 1, 3, 7, 8 and 10 are absent. They ask about a document's argument, and a script cannot read for
 it. The skills check those while they write.

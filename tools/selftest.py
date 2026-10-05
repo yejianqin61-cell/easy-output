@@ -63,6 +63,17 @@ PROBE_BODY = (
 )
 PROBE_EXPECTS = ("sentence is", "cell is 150 chars", "code without a name")
 
+# Clause 5 has two thresholds, so the probe needs a file small enough to trip both.
+BOLD_PROBE = "a-bold-probe.md"
+BOLD_PROBE_BODY = (
+    "# Bold probe\n"
+    "\n"
+    "One line carrying **two** separate **emphasis** spans, and a **third** one.\n"
+    "A second **line** with emphasis inside it.\n"
+    "A third **line** with emphasis inside it.\n"
+)
+BOLD_PROBE_EXPECTS = ("bold spans per line", "emphasis on")
+
 
 def run(check, *gates):
     p = subprocess.run(
@@ -118,6 +129,15 @@ def main():
         code, out = run(check, "prose")
         probe.unlink()
         for want in PROBE_EXPECTS:
+            ok = want in out and code == 1
+            failures += 0 if ok else 1
+            print("%-5s prose     probe: %s" % ("PASS" if ok else "FAIL", want))
+
+        bold = repo / BOLD_PROBE
+        bold.write_text(BOLD_PROBE_BODY, encoding="utf-8")
+        code, out = run(check, "prose")
+        bold.unlink()
+        for want in BOLD_PROBE_EXPECTS:
             ok = want in out and code == 1
             failures += 0 if ok else 1
             print("%-5s prose     probe: %s" % ("PASS" if ok else "FAIL", want))

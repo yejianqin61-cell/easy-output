@@ -38,11 +38,17 @@ Five steps. Each ends on a check you can make.
 
 ### 1. Pin the round
 
-The fixed point is whatever the user names: a commit, a tag, a branch, a date, "since the last audit".
-Capture `git diff <fixed-point>...HEAD` and `git log <fixed-point>..HEAD --oneline`.
+Both ends of the round are commits. The start is whatever the user names: a commit, a tag, a branch, or
+"since the last audit". The end is `HEAD`.
 
-**Done when** `git rev-parse <fixed-point>` resolves and the diff is non-empty. Fail here, in one line,
-rather than discovering an empty round three steps later.
+A tree with uncommitted changes has no end to audit. The diff you read is not the diff anyone else can
+read, and it moves while you work. When the tree is dirty, say so in one line and stop, or ask the user
+to commit first.
+
+Capture `git diff <start>...HEAD` and `git log <start>..HEAD --oneline`.
+
+**Done when** `git rev-parse <start>` resolves, `git status --porcelain` is empty, and the diff is
+non-empty. Fail here, in one line, rather than discovering an empty round three steps later.
 
 ### 2. Collect last round's requirements
 
@@ -55,7 +61,8 @@ and no ticket still belongs in the table, because it was promised.
 ### 3. Run the two axes
 
 Standards and Spec, as parallel sub-agents where the platform supports it, so neither pollutes the
-other's context.
+other's context. Where it does not, run the axes one after the other, and record in the document which
+way you ran them.
 
 **Spec axis** takes the requirements from step 2 one at a time: which acceptance items are met, which
 are partial, which are absent. Quote the requirement behind every finding.
@@ -78,7 +85,9 @@ Sub-agent briefs:
   acceptance items missing or partial; (b) behaviour nobody asked for; (c) items that look implemented
   and are wrong. Quote the requirement for each. Under 400 words."
 
-**Done when** both axes report, and every defect names a file and a line.
+**Done when** both axes report, and every defect names a file and a line. Every defect's evidence came
+from a command you ran, and that a reader can run again to see the same output. A defect you cannot
+reproduce is not a defect yet: re-run it, and cut it if it does not hold.
 
 ### 4. Write the document
 
@@ -123,14 +132,15 @@ meet the complaints.
 
 ## 3. Improvement plans
 
-One plan per defect, IDs matched. Each plan is a task document in short form; a plan that needs more
+One plan per defect, IDs matched. A plan says what to build, and how you will know it works. `easy-plan`
+turns a set of plans into phases and one-line tasks; this part stops at the plan. A plan that needs more
 room becomes its own ticket.
 
 ### P-1 ← D-1 Clear the counter when the lock is released
 
 - **What to build**: `releaseLock()` clears `attempts`, with an end-to-end test covering lock, release,
   then another failure.
-- **Scope**: `src/auth/**`.
+- **Touches**: `src/auth/**`.
 - **Acceptance**: [ ] the counter is 0 after release　[ ] the new test fails against the old
   implementation　[ ] every acceptance item of R-2 passes.
 - **Blocked by**: nothing, it can start now.
@@ -140,7 +150,7 @@ room becomes its own ticket.
 
 - **What to build**: move the threshold and the counting rule into `failedAttempts.ts`, and make both
   call sites reference it.
-- **Scope**: `src/auth/**`, `src/session/**`.
+- **Touches**: `src/auth/**`, `src/session/**`.
 - **Acceptance**: [ ] the threshold is defined once　[ ] both test files stay green.
 - **Blocked by**: P-1 Clear the counter when the lock is released, same file area.
 - **Out of scope**: a configurable source for the threshold.
@@ -153,9 +163,10 @@ acceptance items.
 ### 5. Verify
 
 Count the twelve clauses in [references/readability-law.md](references/readability-law.md) and run its
-edit pass, then check the three things this shape adds:
+edit pass, then check the four things this shape adds:
 
 - Every percentage traces to acceptance items.
+- Every defect's evidence reproduces when the command is run again.
 - Every defect in part 2 has exactly one plan in part 3, with the IDs lining up.
 - Part 1 comes first.
 

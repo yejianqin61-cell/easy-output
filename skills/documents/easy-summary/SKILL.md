@@ -63,6 +63,9 @@ at the foot of the table.
 
 ### 4. Write the three parts
 
+Part 3 holds a situation rather than an assignment. Each line names something not yet done, and what its
+absence costs the reader. State it and stop: the reader decides whether it becomes work.
+
 <summary-template>
 
 ## 1. Headline
